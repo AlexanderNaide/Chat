@@ -14,22 +14,47 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import ru.gb.Chatterbox.client.net.MessageProcessor;
 
 import javax.swing.event.ChangeEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class ChatController implements Initializable {
+public class ChatController implements Initializable, MessageProcessor {
 
     @FXML
-    public Button add;
+    private Button add;
 
     @FXML
-    public Button addGroup;
+    private Button addGroup;
 
     @FXML
-    public Button del;
+    private Button del;
+
+    @FXML
+    private VBox changeNickPanel;
+
+    @FXML
+    private VBox changePasswordPanel;
+
+    @FXML
+    private TextField newNickField;
+
+    @FXML
+    private TextField newPassField;
+
+    @FXML
+    private TextField oldPassField;
+
+    @FXML
+    private VBox loginPanel;
+
+    @FXML
+    private TextField PasswordField;
+
+    @FXML
+    private TextField LoginField;
 
     @FXML
     private VBox mainPanel;
@@ -117,6 +142,27 @@ public class ChatController implements Initializable {
         helpWindow.setTitle("Help");
         helpWindow.setScene(helpScene);
         helpWindow.show();
+
+    }
+
+    @Override
+    public void processMessage(String message) {
+
+    }
+
+    public void sendChangeNick(ActionEvent actionEvent) {
+
+    }
+
+    public void returnToChat(ActionEvent actionEvent) {
+
+    }
+
+    public void sendChangePass(ActionEvent actionEvent) {
+
+    }
+
+    public void sendAuth(ActionEvent actionEvent) {
 
     }
 }
