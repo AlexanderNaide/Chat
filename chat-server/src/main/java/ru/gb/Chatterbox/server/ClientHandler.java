@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Arrays;
 
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
@@ -36,11 +37,10 @@ public class ClientHandler {
         handlerThread = new Thread(() -> {
             authorize();
 
-            while (!Thread.currentThread().isInterrupted() && socket.isConnected()){
+            while (!Thread.currentThread().isInterrupted() && !socket.isConnected()){
                 try{
                     String message = in.readUTF();
                     parseMessage(message);
-
                 } catch (IOException e){
                     System.out.println("Connection broken with client: " + user);
                     server.removeHandler(this);
@@ -73,6 +73,7 @@ public class ClientHandler {
                     String nickname = null;
 
                     try{
+
                         nickname = server.getUserService().authenticate(parsed[1], parsed[2]);
                     } catch (WrongCredentialsException e){
                         response = ERROR_MESSAGE.getCommand() + REGEX + e.getMessage();

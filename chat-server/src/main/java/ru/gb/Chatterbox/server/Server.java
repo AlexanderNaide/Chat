@@ -7,6 +7,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
+import static ru.gb.Chatterbox.enums.Command.LIST_USERS;
 
 public class Server {
 
@@ -61,13 +65,27 @@ public class Server {
 
     public synchronized void addHandler(ClientHandler handler){
         this.handlers.add(handler);
+        sendContacts();
     }
 
     public synchronized void removeHandler(ClientHandler handler) {
         this.handlers.remove(handler);
+        sendContacts();
     }
 
     private void shutdown(){
         userService.stop();
+    }
+
+    private void sendContacts(){
+        String contacts = handlers.stream()
+                .map(ClientHandler::getUser)
+                .collect(Collectors.joining(REGEX));
+
+        String msg = LIST_USERS.getCommand() + REGEX + contacts;
+
+        for (ClientHandler handler : handlers) {
+            handler.send(msg);
+        }
     }
 }

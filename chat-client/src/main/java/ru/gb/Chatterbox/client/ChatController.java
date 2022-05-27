@@ -15,11 +15,17 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
+import ru.gb.Chatterbox.client.net.NetworkService;
+import ru.gb.Chatterbox.enums.Command;
 
 import javax.swing.event.ChangeEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+
+import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
+import static ru.gb.Chatterbox.enums.Command.AUTH_MESSAGE;
+import static ru.gb.Chatterbox.enums.Command.BROADCAST_MESSAGE;
 
 public class ChatController implements Initializable, MessageProcessor {
 
@@ -71,6 +77,10 @@ public class ChatController implements Initializable, MessageProcessor {
     @FXML
     private Button btnSend;
 
+    private NetworkService networkService;
+
+    private String user;
+
     public void mockAction(ActionEvent actionEvent) {
         System.out.println("mock");
     }
@@ -80,13 +90,35 @@ public class ChatController implements Initializable, MessageProcessor {
     }
 
     public void sendMessage(ActionEvent actionEvent) {
-        String text = inputField.getText();
-        if(text == null || text.isBlank()){
-            return;
+        try{
+            String text = inputField.getText();
+            if (text == null || text.isBlank()) {
+                return;
+            }
+            text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
+            String recipient = contacts.getSelectionModel().getSelectedItem();
+
+            networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text); //тут заменить
+
+/*            if (recipient.equals("ALL")) {
+                networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text);
+            }*/
+
+            //@TODO private msgs
+
+            chatArea.appendText(text + System.lineSeparator());
+            inputField.clear();
+        }catch (IOException e){
+            showError("Network error.");
         }
-        text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
-        chatArea.appendText(text + System.lineSeparator());
-        inputField.clear();
+    }
+
+    private void showError(String s) {
+        Alert alert = new Alert(Alert.AlertType.ERROR,
+                s,
+                ButtonType.CLOSE
+                );
+        alert.showAndWait();
     }
 
     @Override
@@ -96,12 +128,14 @@ public class ChatController implements Initializable, MessageProcessor {
         contacts.setItems(FXCollections.observableList(names));
         */
 
-        Group all = new Group("Все");
-        ArrayList<Group> groups = new ArrayList<>();
-        groups.add(all);
-        all.addGroup(List.of(new Name("Vasja"), new Name("Masha"), new Name("Petja"), new Name("Valera"), new Name("Sergey")));
+//        Group all = new Group("Все");
+//        ArrayList<Group> groups = new ArrayList<>();
+//        groups.add(all);
+//        all.addGroup(List.of(new Name("Vasja"), new Name("Masha"), new Name("Petja"), new Name("Valera"), new Name("Sergey")));
 
-        ObservableList<String> list = FXCollections.observableArrayList();
+        networkService = new NetworkService(this);
+
+/*        ObservableList<String> list = FXCollections.observableArrayList();
 
         for (Group g : groups) {
             list.add(g.getTitle());
@@ -130,7 +164,7 @@ public class ChatController implements Initializable, MessageProcessor {
                     }
                 }
             }
-        });
+        });*/
     }
 
     public void helpAction(ActionEvent actionEvent) throws IOException {
@@ -148,21 +182,69 @@ public class ChatController implements Initializable, MessageProcessor {
     @Override
     public void processMessage(String message) {
 
+        System.out.println("processMessage в ChatController" + message);
+
+        Platform.runLater(() -> parseMessage(message));
+//        parseMessage(message);
+    }
+    private void parseMessage(String message){
+
+        System.out.println("parseMessage в ChatController" + message);
+
+        String[] split = message.split(REGEX);
+        Command command = Command.getByCommand(split[0]);
+
+        switch (command){
+            case AUTH_OK -> authOk(split);
+            case ERROR_MESSAGE -> showError(split[1]);
+            case LIST_USERS -> parseUsers(split);
+            default -> chatArea.appendText(split[1] + System.lineSeparator());
+        }
+    }
+
+    private void parseUsers(String[] split){
+        List<String> contact = new ArrayList<>(Arrays.asList(split));
+        contact.set(0, "ALL");
+        contacts.setItems(FXCollections.observableList(contact));
+    }
+
+    private void authOk(String[] split){
+        user = split[1];
+        loginPanel.setVisible(false);
+        mainPanel.setVisible(true);
     }
 
     public void sendChangeNick(ActionEvent actionEvent) {
-
+        //@TODO
     }
 
     public void returnToChat(ActionEvent actionEvent) {
-
+        //@TODO
     }
 
     public void sendChangePass(ActionEvent actionEvent) {
-
+        //@TODO
     }
 
     public void sendAuth(ActionEvent actionEvent) {
+        String login = LoginField.getText();
+        String password = PasswordField.getText();
 
+        if (login.isBlank() || password.isBlank()){
+            return;
+        }
+        String msg = AUTH_MESSAGE.getCommand() + REGEX + login + REGEX + password;
+
+        try{
+            if (!networkService.isConnected()) {
+                networkService.connect();
+
+                System.out.println("networkService.connect(); запущен");
+
+            }
+            networkService.sendMessage(msg);
+        }catch (IOException e){
+            showError("Network error.");
+        }
     }
 }
