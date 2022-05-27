@@ -42,6 +42,7 @@ public class ClientHandler {
                     String message = in.readUTF();
                     parseMessage(message);
                 } catch (IOException e){
+                    Thread.currentThread().interrupt();
                     System.out.println("Connection broken with client: " + user);
                     server.removeHandler(this);
                 }
