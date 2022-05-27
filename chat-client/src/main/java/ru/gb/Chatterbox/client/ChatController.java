@@ -194,6 +194,8 @@ public class ChatController implements Initializable, MessageProcessor {
         String[] split = message.split(REGEX);
         Command command = Command.getByCommand(split[0]);
 
+        System.out.println("Мы в parseMessage в ChatController и наша команда" + command);
+
         switch (command){
             case AUTH_OK -> authOk(split);
             case ERROR_MESSAGE -> showError(split[1]);

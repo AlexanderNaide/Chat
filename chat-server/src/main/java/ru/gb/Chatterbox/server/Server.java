@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
+import static ru.gb.Chatterbox.enums.Command.BROADCAST_MESSAGE;
 import static ru.gb.Chatterbox.enums.Command.LIST_USERS;
 
 public class Server {
@@ -46,7 +47,7 @@ public class Server {
     public void broadcast(String from, String message){
         String msg = String.format("[%s]: %s", from, message);
         for (ClientHandler handler : handlers){
-            handler.send(msg);
+            handler.send(BROADCAST_MESSAGE.getCommand() + REGEX + msg);
         }
     }
 
