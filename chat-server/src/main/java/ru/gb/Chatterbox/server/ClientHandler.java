@@ -40,7 +40,6 @@ public class ClientHandler {
             while (!Thread.currentThread().isInterrupted() && socket.isConnected()){
                 try{
                     String message = in.readUTF();
-                    System.out.println("Мы в ClientHandler - handle и ьы получили сообщение: " + message);
                     parseMessage(message);
                 } catch (IOException e){
                     System.out.println("Connection broken with client: " + user);
@@ -53,13 +52,9 @@ public class ClientHandler {
 
     private void parseMessage(String message) {
 
-        System.out.println("Мы в ClientHandler - parseMessage и наше сообщение: " + message);
-
         String[] split = message.split(REGEX);
 
         Command command = Command.getByCommand(split[0]);
-
-        System.out.println("Мы в ClientHandler - parseMessage и наша команда: " + command);
 
         switch (command){
             case BROADCAST_MESSAGE -> server.broadcast(user, split[1]);

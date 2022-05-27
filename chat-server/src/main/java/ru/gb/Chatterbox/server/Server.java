@@ -47,7 +47,9 @@ public class Server {
     public void broadcast(String from, String message){
         String msg = String.format("[%s]: %s", from, message);
         for (ClientHandler handler : handlers){
-            handler.send(BROADCAST_MESSAGE.getCommand() + REGEX + msg);
+            if(!handler.getUser().equals(from)){
+                handler.send(BROADCAST_MESSAGE.getCommand() + REGEX + msg);
+            }
         }
     }
 

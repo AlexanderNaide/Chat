@@ -3,12 +3,12 @@ package ru.gb.Chatterbox.client;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Group {
+public class Groups {
     private final ArrayList<Name> names = new ArrayList<>();
     private String title;
     private boolean unfold;
 
-    public Group(String title){
+    public Groups(String title){
         this.title = title;
         this.unfold = true;
     }

@@ -19,7 +19,6 @@ public class NetworkService {
 
     public void connect() throws IOException {
         socket = new Socket(HOST, PORT);
-        System.out.println("connect(); запущен");
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
         readMessages();
@@ -28,12 +27,8 @@ public class NetworkService {
     private void readMessages() {
         clientThread = new Thread(() -> {
             try {
-
-                System.out.println("readMessages пошел");
                 while (!socket.isClosed() && !Thread.currentThread().isInterrupted()) {
-                    System.out.println("Мы в цикле у readMessages");
                     String income = in.readUTF();
-                    System.out.println("readMessages sssssssss " + income);
                     messageProcessor.processMessage(income);
                 }
             } catch (IOException e) {
@@ -50,7 +45,6 @@ public class NetworkService {
     }
 
     public void sendMessage(String message) throws IOException {
-        System.out.println("мы в sendMessage и мы отправляем " + message);
         out.writeUTF(message);
     }
 

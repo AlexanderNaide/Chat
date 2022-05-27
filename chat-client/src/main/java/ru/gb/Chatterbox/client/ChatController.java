@@ -95,10 +95,9 @@ public class ChatController implements Initializable, MessageProcessor {
             if (text == null || text.isBlank()) {
                 return;
             }
-            text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
-            String recipient = contacts.getSelectionModel().getSelectedItem();
-
             networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text); //тут заменить
+            text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
+            String recipient = contacts.getFocusModel().getFocusedItem();
 
 /*            if (recipient.equals("ALL")) {
                 networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text);
@@ -182,19 +181,13 @@ public class ChatController implements Initializable, MessageProcessor {
     @Override
     public void processMessage(String message) {
 
-        System.out.println("processMessage в ChatController" + message);
-
         Platform.runLater(() -> parseMessage(message));
 //        parseMessage(message);
     }
     private void parseMessage(String message){
 
-        System.out.println("parseMessage в ChatController" + message);
-
         String[] split = message.split(REGEX);
         Command command = Command.getByCommand(split[0]);
-
-        System.out.println("Мы в parseMessage в ChatController и наша команда" + command);
 
         switch (command){
             case AUTH_OK -> authOk(split);
@@ -240,8 +233,6 @@ public class ChatController implements Initializable, MessageProcessor {
         try{
             if (!networkService.isConnected()) {
                 networkService.connect();
-
-                System.out.println("networkService.connect(); запущен");
 
             }
             networkService.sendMessage(msg);
