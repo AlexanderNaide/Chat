@@ -12,25 +12,22 @@ import java.util.Objects;
 
 public class inMemoryUserServiceImpl implements UserService {
 
-    private final List<Group> allGroups;
+    private final List<User> allUsers;
 
     public inMemoryUserServiceImpl() {
-        this.allGroups = new ArrayList<>();
+        this.allUsers = new ArrayList<>();
     }
 
     @Override
     public void start() {
-        Group allUser = new Group("ALL");
-        allGroups.add(allUser);
         File usersArchive = new File(String.valueOf(getClass().getResource("users.txt")));
-        File groupsArchive = new File(String.valueOf(getClass().getResource("groups.txt")));
 
         if(usersArchive.length() == 0){
-            allUser.addUser(new User("log1", "pass1", "nick1"));
-            allUser.addUser(new User("log2", "pass2", "nick2"));
-            allUser.addUser(new User("log3", "pass3", "nick3"));
-            allUser.addUser(new User("log4", "pass4", "nick4"));
-            allUser.addUser(new User("log5", "pass5", "nick5"));
+            allUsers.add(new User("log1", "pass1", "nick1"));
+            allUsers.add(new User("log2", "pass2", "nick2"));
+            allUsers.add(new User("log3", "pass3", "nick3"));
+            allUsers.add(new User("log4", "pass4", "nick4"));
+            allUsers.add(new User("log5", "pass5", "nick5"));
         }
 
         //TODO здесь реализовать загрузку юзеров из файла
@@ -45,7 +42,7 @@ public class inMemoryUserServiceImpl implements UserService {
 
     @Override
     public String authenticate(String login, String password) {
-        for (User user : allGroups.get(0).getUsers()) {
+        for (User user : allUsers) {
             if (Objects.equals(login, user.getLogin()) && Objects.equals(password, user.getPassword())){
                 return user.getNick();
             }
@@ -61,12 +58,12 @@ public class inMemoryUserServiceImpl implements UserService {
     @Override
     public User createUser(String login, String password, String newNick) {
 
-        for (User user : allGroups.get(0).getUsers()) {
+        for (User user : allUsers) {
             if(user.getNick().equals(newNick)){
                 break;
             } else {
                 User newUser = new User(login, password, newNick);
-                allGroups.get(0).addUser(newUser);
+                allUsers.add(newUser);
                 return newUser;
             }
         }

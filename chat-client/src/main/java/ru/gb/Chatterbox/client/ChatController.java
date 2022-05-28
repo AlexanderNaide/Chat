@@ -19,6 +19,7 @@ import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
 
 import javax.swing.event.ChangeEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -81,6 +82,10 @@ public class ChatController implements Initializable, MessageProcessor {
 
     private String user;
 
+    private static ArrayList<Group> groups;
+
+    private static ObservableList <String> list;
+
     public void mockAction(ActionEvent actionEvent) {
         System.out.println("mock");
     }
@@ -126,28 +131,40 @@ public class ChatController implements Initializable, MessageProcessor {
         List<String> names = List.of("Vasja", "Masha", "Petja", "Valera", "Sergey");
         contacts.setItems(FXCollections.observableList(names));
         */
+        groups = new ArrayList<>();
+        Group allUsers = new Group("Все");
+        groups.add(allUsers);
 
-//        Group all = new Group("Все");
-//        ArrayList<Group> groups = new ArrayList<>();
-//        groups.add(all);
-//        all.addGroup(List.of(new Name("Vasja"), new Name("Masha"), new Name("Petja"), new Name("Valera"), new Name("Sergey")));
+        File usersArchive = new File(String.valueOf(getClass().getResource("users.txt")));
+        File groupsArchive = new File(String.valueOf(getClass().getResource("groups.txt")));
+
+        if(usersArchive.length() != 0){
+            downloadUsers(usersArchive, allUsers);
+        }
 
         networkService = new NetworkService(this);
 
-/*        ObservableList<String> list = FXCollections.observableArrayList();
+        list = FXCollections.observableArrayList();
 
         for (Group g : groups) {
             list.add(g.getTitle());
             if (g.getUnfold()) {
-                for (Name n : g.getGroup()) {
-                    list.add(n.toString());
+                for (User user : g.getUsers()) {
+                    if (!this.user.equals(user.getNick())) {
+                        list.add(user.getName(user.getNick()));
+                    }
                 }
             }
         }
 
         contacts.setItems(list);
 
-        contacts.setOnMouseClicked(e -> {
+/*        contacts.setOnMouseClicked(e -> {
+
+            if(mouseEvent.getClickCount() == 2){
+                System.out.println("Double clicked");
+            }
+
             for (Group g: groups){
                 if (g.getTitle().equals(contacts.getFocusModel().getFocusedItem())){
                     if (g.isUnfold()){
@@ -164,6 +181,10 @@ public class ChatController implements Initializable, MessageProcessor {
                 }
             }
         });*/
+    }
+
+    private void downloadUsers(File usersArchive, Group allUsers) {
+
     }
 
     public void helpAction(ActionEvent actionEvent) throws IOException {
@@ -198,9 +219,10 @@ public class ChatController implements Initializable, MessageProcessor {
     }
 
     private void parseUsers(String[] split){
-        List<String> contact = new ArrayList<>(Arrays.asList(split));
-        contact.set(0, "ALL");
-        contacts.setItems(FXCollections.observableList(contact));
+//        List<String> contact = new ArrayList<>(Arrays.asList(split));
+//        contact.set(0, "ALL");
+        list.addAll(split);
+        contacts.setItems(FXCollections.observableList(list));
     }
 
     private void authOk(String[] split){
