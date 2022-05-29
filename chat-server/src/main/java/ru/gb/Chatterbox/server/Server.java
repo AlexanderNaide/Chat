@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
-import static ru.gb.Chatterbox.enums.Command.BROADCAST_MESSAGE;
-import static ru.gb.Chatterbox.enums.Command.LIST_USERS;
+import static ru.gb.Chatterbox.enums.Command.*;
 
 public class Server {
 
@@ -50,6 +49,16 @@ public class Server {
             if(!handler.getUser().equals(from)){
                 handler.send(BROADCAST_MESSAGE.getCommand() + REGEX + msg);
             }
+        }
+    }
+
+    public void privateMsg(String from, String forUser, String message){ //
+        String msg = String.format("[%s]: %s", from, message);
+        for (ClientHandler handler : handlers){
+            if(handler.getUser().equals(forUser)){
+                handler.send(PRIVATE_MESSAGE.getCommand() + REGEX + msg);
+            }
+            break;
         }
     }
 

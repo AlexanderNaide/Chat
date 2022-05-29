@@ -1,7 +1,6 @@
 package ru.gb.Chatterbox.server.service.impl;
 
 import ru.gb.Chatterbox.server.error.WrongCredentialsException;
-import ru.gb.Chatterbox.server.model.Group;
 import ru.gb.Chatterbox.server.model.User;
 import ru.gb.Chatterbox.server.service.UserService;
 

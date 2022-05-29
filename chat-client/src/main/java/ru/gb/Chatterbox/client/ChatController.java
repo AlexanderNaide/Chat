@@ -26,8 +26,7 @@ import java.net.URL;
 import java.util.*;
 
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
-import static ru.gb.Chatterbox.enums.Command.AUTH_MESSAGE;
-import static ru.gb.Chatterbox.enums.Command.BROADCAST_MESSAGE;
+import static ru.gb.Chatterbox.enums.Command.*;
 
 public class ChatController implements Initializable, MessageProcessor {
 
@@ -101,16 +100,27 @@ public class ChatController implements Initializable, MessageProcessor {
             if (text == null || text.isBlank()) {
                 return;
             }
-            networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text); //тут заменить
-            text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
+
             String recipient = contacts.getFocusModel().getFocusedItem();
 
-/*            if (recipient.equals("ALL")) {
+            boolean msgForGroup = false;
+
+            for (Group group : groups) {
+                if(recipient.equals(group.getTitle())){
+                    msgForGroup = true;
+                    for (User user : group.getUsers()) {
+                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + user.getNick() + REGEX + text);
+                    }
+                }
+                break;
+            }
+
+            if (!msgForGroup){
+                networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
+            } else {
                 networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text);
-            }*/
-
-            //@TODO private msgs
-
+            }
+            text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
             chatArea.appendText(text + System.lineSeparator());
             inputField.clear();
         }catch (IOException e){
