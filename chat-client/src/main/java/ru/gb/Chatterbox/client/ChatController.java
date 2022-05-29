@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
@@ -203,7 +204,6 @@ public class ChatController implements Initializable, MessageProcessor {
     public void processMessage(String message) {
 
         Platform.runLater(() -> parseMessage(message));
-//        parseMessage(message);
     }
     private void parseMessage(String message){
 
@@ -219,15 +219,21 @@ public class ChatController implements Initializable, MessageProcessor {
     }
 
     private void parseUsers(String[] split){
-//        List<String> contact = new ArrayList<>(Arrays.asList(split));
+        List<String> contact = new ArrayList<>(Arrays.asList(split));
 //        contact.set(0, "ALL");
-        list.addAll(split);
+
+        contact.remove(0);
+        contact.remove(user);
+        contact.removeIf(s -> list.contains(s));
+
+        list.addAll(contact);
         contacts.setItems(FXCollections.observableList(list));
     }
 
     private void authOk(String[] split){
         user = split[1];
         loginPanel.setVisible(false);
+        Application.primaryStage.setTitle("Chatterbox - " + user);
         mainPanel.setVisible(true);
     }
 
