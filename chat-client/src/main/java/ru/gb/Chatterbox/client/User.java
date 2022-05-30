@@ -1,6 +1,6 @@
 package ru.gb.Chatterbox.client;
 
-public class User {
+public class User implements target{
 
     private String nick;
     private String name;
@@ -11,6 +11,14 @@ public class User {
         this.nick = nick;
         if (isNew){
             setNew();
+        }
+    }
+
+    public String toString() {
+        if(name != null) {
+            return name;
+        } else {
+            return nick;
         }
     }
 

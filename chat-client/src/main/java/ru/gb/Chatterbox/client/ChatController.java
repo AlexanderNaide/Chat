@@ -14,6 +14,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
@@ -84,6 +86,7 @@ public class ChatController implements Initializable, MessageProcessor {
 
     private static ArrayList<Group> groups;
 
+//    private static ObservableList <target> list;
     private static ObservableList <String> list;
 
     public void mockAction(ActionEvent actionEvent) {
@@ -138,10 +141,7 @@ public class ChatController implements Initializable, MessageProcessor {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-/*
-        List<String> names = List.of("Vasja", "Masha", "Petja", "Valera", "Sergey");
-        contacts.setItems(FXCollections.observableList(names));
-        */
+
         groups = new ArrayList<>();
         Group allUsers = new Group("Все");
         groups.add(allUsers);
@@ -157,6 +157,8 @@ public class ChatController implements Initializable, MessageProcessor {
 
         list = FXCollections.observableArrayList();
 
+
+
         for (Group g : groups) {
             list.add(g.getTitle());
             if (g.getUnfold()) {
@@ -167,6 +169,7 @@ public class ChatController implements Initializable, MessageProcessor {
                 }
             }
         }
+
 
         contacts.setItems(list);
 

@@ -3,7 +3,7 @@ package ru.gb.Chatterbox.client;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Group {
+public class Group implements target{
     private final ArrayList<User> users = new ArrayList<>();
     private String title;
     private boolean unfold;
