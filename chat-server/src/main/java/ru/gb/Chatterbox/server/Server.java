@@ -91,9 +91,6 @@ public class Server {
                 .map(ClientHandler::getUser)
                 .collect(Collectors.joining(REGEX));
 
-        System.out.println(contacts);
-
-
 //        String contacts = handlers.stream()
 //                .map(ClientHandler::getUser)
 //                .collect(Collectors.joining(REGEX));
