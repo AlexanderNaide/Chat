@@ -13,6 +13,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -31,6 +33,8 @@ import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 
 public class ChatController implements Initializable, MessageProcessor {
+
+    public TreeView <String> contactPanel;
 
     @FXML
     private Button add;
@@ -84,10 +88,11 @@ public class ChatController implements Initializable, MessageProcessor {
 
     private String user;
 
-    private static ArrayList<Group> groups;
+    private static Map <String, Group> groups;
 
 //    private static ObservableList <target> list;
-    private static ObservableList <String> list;
+
+    TreeItem <String> root;
 
     public void mockAction(ActionEvent actionEvent) {
         System.out.println("mock");
@@ -104,26 +109,24 @@ public class ChatController implements Initializable, MessageProcessor {
                 return;
             }
 
-            String recipient = contacts.getFocusModel().getFocusedItem();
+            MultipleSelectionModel<TreeItem<String>> selectionModel = contactPanel.getSelectionModel();
+            selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
 
-            boolean msgForGroup = false;
+            StringBuilder forMessage = new StringBuilder();
 
-            for (Group group : groups) {
-                if(recipient.equals(group.getTitle())){
-                    msgForGroup = true;
-                    for (User user : group.getUsers()) {
-                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + user.getNick() + REGEX + text);
+            for(TreeItem<String> item : selectionModel.getSelectedItems()){
+                String recipient = item.getValue();
+                forMessage.append(" ").append(recipient).append(",");
+                if (groups.containsKey(recipient)){
+                    for (String s : groups.get(recipient).getUsers().keySet()) {
+                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + s + REGEX + text);
                     }
+                } else {
+                    networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
                 }
-                break;
             }
-
-            if (!msgForGroup){
-                networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
-            } else {
-                networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text);
-            }
-            text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
+            forMessage.deleteCharAt(forMessage.length()-1);
+            text = "[Message for" + forMessage + ":] " + text;
             chatArea.appendText(text + System.lineSeparator());
             inputField.clear();
         }catch (IOException e){
@@ -142,9 +145,22 @@ public class ChatController implements Initializable, MessageProcessor {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        groups = new ArrayList<>();
+        groups = new HashMap<>();
         Group allUsers = new Group("Все");
-        groups.add(allUsers);
+        groups.put(allUsers.getTitle(), allUsers);
+
+        // необязательные группы
+        Group myOffice = new Group("Мой отдел");
+        myOffice.add(new User("Толик"));
+        myOffice.add(new User("Ваня"));
+        myOffice.add(new User("Рома"));
+        myOffice.add(new User("Ира"));
+        groups.put(myOffice.getTitle(), myOffice);
+        Group btcOffice = new Group("БТКашки");
+        btcOffice.add(new User("Дашка"));
+        btcOffice.add(new User("Женька-печенька"));
+        btcOffice.add(new User("Танюха"));
+        groups.put(btcOffice.getTitle(), btcOffice);
 
         File usersArchive = new File(String.valueOf(getClass().getResource("users.txt")));
         File groupsArchive = new File(String.valueOf(getClass().getResource("groups.txt")));
@@ -152,14 +168,12 @@ public class ChatController implements Initializable, MessageProcessor {
         if(usersArchive.length() != 0){
             downloadUsers(usersArchive, allUsers);
         }
-
         networkService = new NetworkService(this);
+        setItems();
 
-        list = FXCollections.observableArrayList();
+//        list = FXCollections.observableArrayList();
 
-
-
-        for (Group g : groups) {
+/*        for (Group g : groups) {
             list.add(g.getTitle());
             if (g.getUnfold()) {
                 for (User user : g.getUsers()) {
@@ -168,10 +182,9 @@ public class ChatController implements Initializable, MessageProcessor {
                     }
                 }
             }
-        }
+        }*/
 
-
-        contacts.setItems(list);
+//        contacts.setItems(list);
 
 /*        contacts.setOnMouseClicked(e -> {
 
@@ -197,6 +210,23 @@ public class ChatController implements Initializable, MessageProcessor {
         });*/
     }
 
+    private void setItems() {
+        root = new TreeItem<>();
+        for (Group g : groups.values()) {
+            TreeItem <String> item = new TreeItem<>(g.toString());
+            root.getChildren().add(item);
+            for (String s : g.getUsers().keySet()) {
+                TreeItem <String> childrenItem = new TreeItem<>(s);
+                item.getChildren().add(childrenItem);
+            }
+            root.setExpanded(g.getUnfold());
+        }
+        root.setExpanded(true);
+        contactPanel.setShowRoot(false);
+        contactPanel.setRoot(root);
+        contactPanel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    }
+
     private void downloadUsers(File usersArchive, Group allUsers) {
 
     }
@@ -210,7 +240,6 @@ public class ChatController implements Initializable, MessageProcessor {
         helpWindow.setTitle("Help");
         helpWindow.setScene(helpScene);
         helpWindow.show();
-
     }
 
     @Override
@@ -237,10 +266,9 @@ public class ChatController implements Initializable, MessageProcessor {
 
         contact.remove(0);
         contact.remove(user);
-        contact.removeIf(s -> list.contains(s));
-
-        list.addAll(contact);
-        contacts.setItems(FXCollections.observableList(list));
+        contact.removeIf(s -> groups.get("Все").getUsers().containsKey(s));
+        groups.get("Все").addAll(contact);
+        setItems();
     }
 
     private void authOk(String[] split){
