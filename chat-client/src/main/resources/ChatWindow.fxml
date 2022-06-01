@@ -37,14 +37,14 @@
         <Button text="SEND" onAction="#sendChangePass"/>
         <Button text="RETURN" onAction="#returnToChat"/>
     </VBox>
-    <VBox fx:id="loginPanel"  visible="false">
+    <VBox fx:id="loginPanel">
         <Label text="Login:"/>
         <TextField fx:id="LoginField"/>
         <Label text="Password:"/>
         <TextField fx:id="PasswordField" onAction="#sendAuth"/>
         <Button text="Connect" onAction="#sendAuth"/>
     </VBox>
-    <VBox fx:id="mainPanel" >
+    <VBox fx:id="mainPanel" visible="false">
         <MenuBar>
             <Menu text="File">
                 <MenuItem onAction="#mockAction" text="Open" />

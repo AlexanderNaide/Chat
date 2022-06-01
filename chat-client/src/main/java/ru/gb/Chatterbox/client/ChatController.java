@@ -18,7 +18,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
@@ -30,7 +29,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-import static ru.gb.Chatterbox.client.Application.primaryStage;
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 
@@ -147,13 +145,6 @@ public class ChatController implements Initializable, MessageProcessor {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        networkService = new NetworkService(this);
-        try {
-            authorization();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         groups = new HashMap<>();
         Group allUsers = new Group("Все");
         groups.put(allUsers.getTitle(), allUsers);
@@ -177,6 +168,7 @@ public class ChatController implements Initializable, MessageProcessor {
         if(usersArchive.length() != 0){
             downloadUsers(usersArchive, allUsers);
         }
+        networkService = new NetworkService(this);
         setItems();
 
 //        list = FXCollections.observableArrayList();
@@ -239,21 +231,6 @@ public class ChatController implements Initializable, MessageProcessor {
 
     }
 
-    public void authorization () throws IOException {
-        FXMLLoader rLoader = new FXMLLoader();
-        rLoader.setLocation(this.getClass().getResource("/Authorization.fxml"));
-        Parent rParent = rLoader.load();
-        Scene authScene = new Scene(rParent);
-        Stage authWindow = new Stage();
-        authWindow.setResizable(false);
-        authWindow.setTitle("Authentication");
-        authWindow.setScene(authScene);
-
-        authWindow.initModality(Modality.APPLICATION_MODAL);
-        authWindow.initOwner(primaryStage);
-        authWindow.showAndWait();
-    }
-
     public void helpAction(ActionEvent actionEvent) throws IOException {
         FXMLLoader hLoader = new FXMLLoader();
         hLoader.setLocation(this.getClass().getResource("/HelpWindow.fxml"));
@@ -297,7 +274,7 @@ public class ChatController implements Initializable, MessageProcessor {
     private void authOk(String[] split){
         user = split[1];
         loginPanel.setVisible(false);
-        primaryStage.setTitle("Chatterbox - " + user);
+        Application.primaryStage.setTitle("Chatterbox - " + user);
         mainPanel.setVisible(true);
     }
 
