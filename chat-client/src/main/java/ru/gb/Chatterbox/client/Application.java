@@ -23,7 +23,7 @@ public class Application extends javafx.application.Application {
         Scene scene = new Scene(parent);
         scene.getStylesheets().add("styles.css");
         primaryStage.setResizable(false);
-        primaryStage.setTitle("Chatterbox");
+        primaryStage.setTitle("Authorization");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import static javafx.scene.control.PopupControl.USE_COMPUTED_SIZE;
 import static ru.gb.Chatterbox.client.Application.primaryStage;
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
@@ -37,6 +39,10 @@ import static ru.gb.Chatterbox.enums.Command.*;
 public class ChatController implements Initializable, MessageProcessor {
 
     public TreeView <String> contactPanel;
+    public AnchorPane anchorPane;
+    public VBox registrationPanel;
+    public TextField newLoginField;
+    public TextField newPasswordField;
 
     @FXML
     private Button add;
@@ -127,7 +133,9 @@ public class ChatController implements Initializable, MessageProcessor {
                     networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
                 }
             }
-            forMessage.deleteCharAt(forMessage.length()-1);
+            if (!forMessage.isEmpty()){
+                forMessage.deleteCharAt(forMessage.length()-1);
+            }
             text = "[Message for" + forMessage + ":] " + text;
             chatArea.appendText(text + System.lineSeparator());
             inputField.clear();
@@ -148,11 +156,6 @@ public class ChatController implements Initializable, MessageProcessor {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         networkService = new NetworkService(this);
-        try {
-            authorization();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         groups = new HashMap<>();
         Group allUsers = new Group("Все");
@@ -239,21 +242,6 @@ public class ChatController implements Initializable, MessageProcessor {
 
     }
 
-    public void authorization () throws IOException {
-        FXMLLoader rLoader = new FXMLLoader();
-        rLoader.setLocation(this.getClass().getResource("/Authorization.fxml"));
-        Parent rParent = rLoader.load();
-        Scene authScene = new Scene(rParent);
-        Stage authWindow = new Stage();
-        authWindow.setResizable(false);
-        authWindow.setTitle("Authentication");
-        authWindow.setScene(authScene);
-
-        authWindow.initModality(Modality.APPLICATION_MODAL);
-        authWindow.initOwner(primaryStage);
-        authWindow.showAndWait();
-    }
-
     public void helpAction(ActionEvent actionEvent) throws IOException {
         FXMLLoader hLoader = new FXMLLoader();
         hLoader.setLocation(this.getClass().getResource("/HelpWindow.fxml"));
@@ -298,6 +286,8 @@ public class ChatController implements Initializable, MessageProcessor {
         user = split[1];
         loginPanel.setVisible(false);
         primaryStage.setTitle("Chatterbox - " + user);
+        primaryStage.setMinHeight(578);
+        primaryStage.setMinWidth(662);
         mainPanel.setVisible(true);
     }
 
@@ -331,5 +321,20 @@ public class ChatController implements Initializable, MessageProcessor {
         }catch (IOException e){
             showError("Network error.");
         }
+    }
+
+    public void sendRegistrationWindow(MouseEvent mouseEvent) {
+        loginPanel.setVisible(false);
+        primaryStage.setTitle("Registration");
+        registrationPanel.setVisible(true);
+    }
+
+    public void sendReg(ActionEvent actionEvent) {
+    }
+
+    public void sendAuthorisationWindow(MouseEvent mouseEvent) {
+        registrationPanel.setVisible(false);
+        primaryStage.setTitle("Authorization");
+        loginPanel.setVisible(true);
     }
 }
