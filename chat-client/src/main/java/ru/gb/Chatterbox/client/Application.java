@@ -22,6 +22,7 @@ public class Application extends javafx.application.Application {
         Parent parent = loader.load();
         Scene scene = new Scene(parent);
         scene.getStylesheets().add("styles.css");
+        primaryStage.setResizable(false);
         primaryStage.setTitle("Chatterbox");
         primaryStage.setScene(scene);
         primaryStage.show();
