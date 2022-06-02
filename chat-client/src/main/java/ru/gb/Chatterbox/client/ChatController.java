@@ -303,6 +303,18 @@ public class ChatController implements Initializable, MessageProcessor {
         //@TODO
     }
 
+    public void sendAuthorisationWindow(MouseEvent mouseEvent) {
+        registrationPanel.setVisible(false);
+        primaryStage.setTitle("Authorization");
+        loginPanel.setVisible(true);
+    }
+
+    public void sendRegistrationWindow(MouseEvent mouseEvent) {
+        loginPanel.setVisible(false);
+        primaryStage.setTitle("Registration");
+        registrationPanel.setVisible(true);
+    }
+
     public void sendAuth(ActionEvent actionEvent) {
         String login = LoginField.getText();
         String password = PasswordField.getText();
@@ -315,7 +327,6 @@ public class ChatController implements Initializable, MessageProcessor {
         try{
             if (!networkService.isConnected()) {
                 networkService.connect();
-
             }
             networkService.sendMessage(msg);
         }catch (IOException e){
@@ -323,18 +334,23 @@ public class ChatController implements Initializable, MessageProcessor {
         }
     }
 
-    public void sendRegistrationWindow(MouseEvent mouseEvent) {
-        loginPanel.setVisible(false);
-        primaryStage.setTitle("Registration");
-        registrationPanel.setVisible(true);
-    }
-
     public void sendReg(ActionEvent actionEvent) {
-    }
+        String login = newLoginField.getText();
+        String password = newPasswordField.getText();
+        String newNick = newNickField.getText();
 
-    public void sendAuthorisationWindow(MouseEvent mouseEvent) {
-        registrationPanel.setVisible(false);
-        primaryStage.setTitle("Authorization");
-        loginPanel.setVisible(true);
+        if (login.isBlank() || password.isBlank() || newNick.isBlank()){
+            return;
+        }
+        String msg = CREATE_MESSAGE.getCommand() + REGEX + login + REGEX + password + REGEX + newNick;
+
+        try{
+            if (!networkService.isConnected()) {
+                networkService.connect();
+            }
+            networkService.sendMessage(msg);
+        }catch (IOException e){
+            showError("Network error.");
+        }
     }
 }

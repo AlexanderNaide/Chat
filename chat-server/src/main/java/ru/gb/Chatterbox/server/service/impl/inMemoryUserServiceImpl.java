@@ -61,14 +61,14 @@ public class inMemoryUserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(String login, String password, String newNick) {
+    public String createUser(String login, String password, String newNick) {
 
         if(!allUsers.containsKey(newNick)){
             User newUser = new User(login, password, newNick);
             allUsers.put(newNick, newUser);
-            return newUser;
+            return newNick;
         } else {
-            throw new WrongCredentialsException("this nickname is already taken.");
+            throw new WrongCredentialsException("This nickname is already taken.");
         }
     }
 

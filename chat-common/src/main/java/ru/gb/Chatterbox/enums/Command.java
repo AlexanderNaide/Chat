@@ -7,6 +7,7 @@ public enum Command {
     LIST_USERS("/list"),
     PRIVATE_MESSAGE("/private"),
     AUTH_MESSAGE("/auth"),
+    CREATE_MESSAGE("/create"),
     AUTH_OK("/auth-ok"),
     ERROR_MESSAGE("/error");
 

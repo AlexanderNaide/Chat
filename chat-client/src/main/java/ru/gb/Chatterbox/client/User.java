@@ -1,6 +1,6 @@
 package ru.gb.Chatterbox.client;
 
-public class User implements Target {
+public class User {
 
     private String nick;
     private String name;
