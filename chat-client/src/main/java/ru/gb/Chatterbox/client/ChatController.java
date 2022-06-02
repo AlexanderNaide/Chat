@@ -13,10 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
@@ -39,6 +36,7 @@ import static ru.gb.Chatterbox.enums.Command.*;
 public class ChatController implements Initializable, MessageProcessor {
 
     public TreeView <String> contactPanel;
+//    public TreeView <itemString> contactPanel;
     public AnchorPane anchorPane;
     public VBox registrationPanel;
     public TextField newLoginField;
@@ -100,6 +98,7 @@ public class ChatController implements Initializable, MessageProcessor {
 
 //    private static ObservableList <target> list;
 
+//    TreeItem <itemString> root;
     TreeItem <String> root;
 
     public void mockAction(ActionEvent actionEvent) {
@@ -117,11 +116,13 @@ public class ChatController implements Initializable, MessageProcessor {
                 return;
             }
 
+//            MultipleSelectionModel<TreeItem<itemString>> selectionModel = contactPanel.getSelectionModel();
             MultipleSelectionModel<TreeItem<String>> selectionModel = contactPanel.getSelectionModel();
             selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
 
             StringBuilder forMessage = new StringBuilder();
 
+//            for(TreeItem<itemString> item : selectionModel.getSelectedItems()){
             for(TreeItem<String> item : selectionModel.getSelectedItems()){
                 String recipient = item.getValue();
                 forMessage.append(" ").append(recipient).append(",");
@@ -221,7 +222,137 @@ public class ChatController implements Initializable, MessageProcessor {
         });*/
     }
 
+    TreeCell<String> treeCell = new TreeCell<>();
+
     private void setItems() {
+/*
+
+*//*
+*//*        root = new TreeItem<>();
+        for (Group g : groups.values()) {
+//            TreeItem <String> item = new TreeItem<>(g.toString());
+            TreeItem <itemString> item = new TreeItem<itemString>(new itemString(g.toString(), "style1"));
+            root.getChildren().add(item);
+            for (String s : g.getUsers().keySet()) {
+                final TreeItem <itemString> childrenItem = new TreeItem<>(new itemString(s, "style2"));
+                item.getChildren().add(childrenItem);
+            }
+            root.setExpanded(g.getUnfold());
+        }
+        root.setExpanded(true);*//**//*
+
+
+        root = new TreeItem<>();
+        for (Group g : groups.values()) {
+//            TreeItem <String> item = new TreeItem<>(g.toString());
+            TreeItem <itemString> item = new TreeItem<itemString>(new itemString(g.toString(), "style1"));
+            root.getChildren().add(item.getValue().getText());
+            for (String s : g.getUsers().keySet()) {
+                final TreeItem <itemString> childrenItem = new TreeItem<>(new itemString(s, "style2"));
+//                final TreeItem <String> childrenItem = new TreeItem<>(new itemString(s, "style2"));
+                item.getChildren().add(childrenItem);
+            }
+            root.setExpanded(g.getUnfold());
+        }
+        root.setExpanded(true);
+
+
+        List<String> allTreeItemStyles = Arrays.asList("style1", "style2", "style3");
+
+                contactPanel.setCellFactory(tv ->  new TreeCell<String>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll(allTreeItemStyles);
+                if (empty) {
+                    setText("");
+                } else {
+                    setText(tv.getEditingItem().getValue().getText()); // appropriate text for item
+                    String styleClass = "style1" ; // choose style class for item
+                    getStyleClass().add(styleClass);
+                }
+            }
+        });
+*//*
+
+
+*//*        contactPanel.setCellFactory(tv ->  new TreeCell<String>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                getStyleClass().removeAll(allTreeItemStyles);
+                if (empty) {
+                    setText("");
+                } else {
+                    setText(""); // appropriate text for item
+                    String styleClass = "style1" ; // choose style class for item
+                    getStyleClass().add(styleClass);
+                }
+            }
+        });*//*
+
+
+        contactPanel.setRoot(root);
+
+
+
+//        contactPanel.setCellFactory(tv ->  new TreeCell<String>() {
+//            @Override
+//            public void updateItem(String item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if(!getStyleClass().contains("style1")){
+//                    getStyleClass().add("style1");
+//                }
+//                if(!getStyleClass().contains("style2")){
+//                    getStyleClass().add("style2");
+//                }
+//                if(!getStyleClass().contains("style3")){
+//                    getStyleClass().add("style3");
+//                }
+
+
+//                root = new TreeItem<>();
+//                for (Group g : groups.values()) {
+//                    TreeItem <String> item2 = new TreeItem<>(g.toString());
+//                    root.getChildren().add(item2);
+////                    String styleClass = "style1" ; // choose style class for item
+////                    getStyleClass().add(styleClass);
+////                    for (String s : g.getUsers().keySet()) {
+////                        final TreeItem <String> childrenItem = new TreeItem<>(s);
+////                        item.getChildren().add(childrenItem);
+////                    }
+//                    root.setExpanded(g.getUnfold());
+//                }
+
+
+//                if (empty) {
+////                    setText("fffffffffffffffff");
+//                    String styleClass = "style2" ;
+//                    getStyleClass().add(styleClass);
+//                } else {
+////                    contactPanel.setRoot(root);
+//                }
+//            }
+//        });
+
+
+//        root = new TreeItem<>();
+//        for (Group g : groups.values()) {
+//            TreeItem <String> item = new TreeItem<>(g.toString());
+//            root.getChildren().add(item);
+//            for (String s : g.getUsers().keySet()) {
+//                final TreeItem <String> childrenItem = new TreeItem<>(s);
+//                item.getChildren().add(childrenItem);
+//            }
+//            root.setExpanded(g.getUnfold());
+//        }
+//        root.setExpanded(true);
+//        contactPanel.setRoot(root);
+        contactPanel.setShowRoot(false);
+        contactPanel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    }*/
+
+//    private void setItems() {
         root = new TreeItem<>();
         for (Group g : groups.values()) {
             TreeItem <String> item = new TreeItem<>(g.toString());
