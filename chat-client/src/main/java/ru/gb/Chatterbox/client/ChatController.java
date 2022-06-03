@@ -115,26 +115,34 @@ public class ChatController implements Initializable, MessageProcessor {
                 return;
             }
 
-//            MultipleSelectionModel<TreeItem<itemString>> selectionModel = contactPanel.getSelectionModel();
             MultipleSelectionModel<TreeItem<String>> selectionModel = contactPanel.getSelectionModel();
+
             selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
 
             StringBuilder forMessage = new StringBuilder();
 
-//            for(TreeItem<itemString> item : selectionModel.getSelectedItems()){
-            for(TreeItem<String> item : selectionModel.getSelectedItems()){
-                String recipient = item.getValue();
-                forMessage.append(" ").append(recipient).append(",");
-                if (groups.containsKey(recipient)){
-                    for (String s : groups.get(recipient).getUsers().keySet()) {
-                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + s + REGEX + text);
+            if(selectionModel.isEmpty()){
+                networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text);
+                forMessage.append(" ").append("ALL");
+            } else {
+                for (TreeItem<String> item : selectionModel.getSelectedItems()) {
+                    String[] split = item.getValue().split(" ");
+                    String recipient = split[1];
+//->
+                    System.out.println(recipient);
+
+                    forMessage.append(" ").append(recipient).append(",");
+                    if (groups.containsKey(recipient)) {
+                        for (String s : groups.get(recipient).getUsers().keySet()) {
+                            networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + s + REGEX + text);
+                        }
+                    } else {
+                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
                     }
-                } else {
-                    networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
                 }
-            }
-            if (!forMessage.isEmpty()){
-                forMessage.deleteCharAt(forMessage.length()-1);
+                if (!forMessage.isEmpty()) {
+                    forMessage.deleteCharAt(forMessage.length() - 1);
+                }
             }
             text = "[Message for" + forMessage + ":] " + text;
             chatArea.appendText(text + System.lineSeparator());
@@ -216,12 +224,11 @@ public class ChatController implements Initializable, MessageProcessor {
         contactPanel.setRoot(root);
         contactPanel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        contactPanel.setCellFactory(tv -> new TreeCell<String>() {
+        contactPanel.setCellFactory(tv -> new TreeCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-
                     setText("");
                 } else {
                     String[] row = item.split(" ");
