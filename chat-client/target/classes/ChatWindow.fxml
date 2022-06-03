@@ -13,8 +13,36 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.Label?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.gb.Chatterbox.client.ChatController">
-    <VBox fx:id="mainPanel" visible="true">
+    <VBox visible="false" fx:id="changeNickPanel">
+        <HBox VBox.vgrow="ALWAYS">
+            <Label text="Please enter you new nickname:"/>
+            <TextField fx:id="newNickField" onAction="#sendChangeNick"/>
+        </HBox>
+        <Button text="SEND" onAction="#sendChangeNick"/>
+        <Button text="RETURN" onAction="#returnToChat"/>
+    </VBox>
+    <VBox visible="false" fx:id="changePasswordPanel">
+        <HBox VBox.vgrow="ALWAYS">
+            <Label text="Please enter you old password:"/>
+            <TextField fx:id="oldPassField" onAction="#sendChangePass"/>
+        </HBox>
+        <HBox VBox.vgrow="ALWAYS">
+            <Label text="Please enter you new password:"/>
+            <TextField fx:id="newPassField" onAction="#sendChangePass"/>
+        </HBox>
+        <Button text="SEND" onAction="#sendChangePass"/>
+        <Button text="RETURN" onAction="#returnToChat"/>
+    </VBox>
+    <VBox fx:id="loginPanel">
+        <Label text="Login:"/>
+        <TextField fx:id="LoginField"/>
+        <Label text="Password:"/>
+        <TextField fx:id="PasswordField" onAction="#sendAuth"/>
+        <Button text="Connect" onAction="#sendAuth"/>
+    </VBox>
+    <VBox fx:id="mainPanel" visible="false">
         <MenuBar>
             <Menu text="File">
                 <MenuItem onAction="#mockAction" text="Open" />

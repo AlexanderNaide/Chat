@@ -9,11 +9,14 @@
         <module name="Chat" />
         <module name="chat-client" />
         <module name="chat-server" />
+        <module name="chat-common" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Chat" target="17" />
       <module name="chat-client" target="17" />
+      <module name="chat-common" target="17" />
+      <module name="chat-common2" target="17" />
       <module name="chat-server" target="17" />
     </bytecodeTargetLevel>
   </component>

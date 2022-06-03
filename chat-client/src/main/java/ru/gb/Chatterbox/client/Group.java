@@ -3,8 +3,8 @@ package ru.gb.Chatterbox.client;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Group {
-    private final ArrayList<Name> names = new ArrayList<>();
+public class Group implements target{
+    private final ArrayList<User> users = new ArrayList<>();
     private String title;
     private boolean unfold;
 
@@ -38,13 +38,11 @@ public class Group {
         return title;
     }
 
-    public void add(Name name){
-        names.add(name);
+    public void add(User name){
+        users.add(name);
     }
-    public void addGroup(List<Name> nameList){
-        names.addAll(nameList);
-    }
-    public ArrayList<Name> getGroup(){
-        return names;
+
+    public ArrayList <User> getUsers(){
+        return users;
     }
 }

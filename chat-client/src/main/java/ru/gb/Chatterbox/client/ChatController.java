@@ -12,24 +12,58 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import ru.gb.Chatterbox.client.net.MessageProcessor;
+import ru.gb.Chatterbox.client.net.NetworkService;
+import ru.gb.Chatterbox.enums.Command;
 
 import javax.swing.event.ChangeEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class ChatController implements Initializable {
+import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
+import static ru.gb.Chatterbox.enums.Command.*;
+
+public class ChatController implements Initializable, MessageProcessor {
 
     @FXML
-    public Button add;
+    private Button add;
 
     @FXML
-    public Button addGroup;
+    private Button addGroup;
 
     @FXML
-    public Button del;
+    private Button del;
+
+    @FXML
+    private VBox changeNickPanel;
+
+    @FXML
+    private VBox changePasswordPanel;
+
+    @FXML
+    private TextField newNickField;
+
+    @FXML
+    private TextField newPassField;
+
+    @FXML
+    private TextField oldPassField;
+
+    @FXML
+    private VBox loginPanel;
+
+    @FXML
+    private TextField PasswordField;
+
+    @FXML
+    private TextField LoginField;
 
     @FXML
     private VBox mainPanel;
@@ -46,6 +80,15 @@ public class ChatController implements Initializable {
     @FXML
     private Button btnSend;
 
+    private NetworkService networkService;
+
+    private String user;
+
+    private static ArrayList<Group> groups;
+
+//    private static ObservableList <target> list;
+    private static ObservableList <String> list;
+
     public void mockAction(ActionEvent actionEvent) {
         System.out.println("mock");
     }
@@ -55,41 +98,87 @@ public class ChatController implements Initializable {
     }
 
     public void sendMessage(ActionEvent actionEvent) {
-        String text = inputField.getText();
-        if(text == null || text.isBlank()){
-            return;
+        try{
+            String text = inputField.getText();
+            if (text == null || text.isBlank()) {
+                return;
+            }
+
+            String recipient = contacts.getFocusModel().getFocusedItem();
+
+            boolean msgForGroup = false;
+
+            for (Group group : groups) {
+                if(recipient.equals(group.getTitle())){
+                    msgForGroup = true;
+                    for (User user : group.getUsers()) {
+                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + user.getNick() + REGEX + text);
+                    }
+                }
+                break;
+            }
+
+            if (!msgForGroup){
+                networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
+            } else {
+                networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text);
+            }
+            text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
+            chatArea.appendText(text + System.lineSeparator());
+            inputField.clear();
+        }catch (IOException e){
+            showError("Network error.");
         }
-        text = "[Message for " + contacts.getFocusModel().getFocusedItem() + ":] " + text;
-        chatArea.appendText(text + System.lineSeparator());
-        inputField.clear();
+    }
+
+    private void showError(String s) {
+        Alert alert = new Alert(Alert.AlertType.ERROR,
+                s,
+                ButtonType.CLOSE
+                );
+        alert.showAndWait();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-/*
-        List<String> names = List.of("Vasja", "Masha", "Petja", "Valera", "Sergey");
-        contacts.setItems(FXCollections.observableList(names));
-        */
 
-        Group all = new Group("Все");
-        ArrayList<Group> groups = new ArrayList<>();
-        groups.add(all);
-        all.addGroup(List.of(new Name("Vasja"), new Name("Masha"), new Name("Petja"), new Name("Valera"), new Name("Sergey")));
+        groups = new ArrayList<>();
+        Group allUsers = new Group("Все");
+        groups.add(allUsers);
 
-        ObservableList<String> list = FXCollections.observableArrayList();
+        File usersArchive = new File(String.valueOf(getClass().getResource("users.txt")));
+        File groupsArchive = new File(String.valueOf(getClass().getResource("groups.txt")));
+
+        if(usersArchive.length() != 0){
+            downloadUsers(usersArchive, allUsers);
+        }
+
+        networkService = new NetworkService(this);
+
+        list = FXCollections.observableArrayList();
+
+
 
         for (Group g : groups) {
             list.add(g.getTitle());
             if (g.getUnfold()) {
-                for (Name n : g.getGroup()) {
-                    list.add(n.toString());
+                for (User user : g.getUsers()) {
+                    if (!this.user.equals(user.getNick())) {
+                        list.add(user.getName(user.getNick()));
+                    }
                 }
             }
         }
 
+
         contacts.setItems(list);
 
-        contacts.setOnMouseClicked(e -> {
+/*        contacts.setOnMouseClicked(e -> {
+
+            if(mouseEvent.getClickCount() == 2){
+                System.out.println("Double clicked");
+            }
+
             for (Group g: groups){
                 if (g.getTitle().equals(contacts.getFocusModel().getFocusedItem())){
                     if (g.isUnfold()){
@@ -105,7 +194,11 @@ public class ChatController implements Initializable {
                     }
                 }
             }
-        });
+        });*/
+    }
+
+    private void downloadUsers(File usersArchive, Group allUsers) {
+
     }
 
     public void helpAction(ActionEvent actionEvent) throws IOException {
@@ -118,5 +211,74 @@ public class ChatController implements Initializable {
         helpWindow.setScene(helpScene);
         helpWindow.show();
 
+    }
+
+    @Override
+    public void processMessage(String message) {
+
+        Platform.runLater(() -> parseMessage(message));
+    }
+    private void parseMessage(String message){
+
+        String[] split = message.split(REGEX);
+        Command command = Command.getByCommand(split[0]);
+
+        switch (command){
+            case AUTH_OK -> authOk(split);
+            case ERROR_MESSAGE -> showError(split[1]);
+            case LIST_USERS -> parseUsers(split);
+            default -> chatArea.appendText(split[1] + System.lineSeparator());
+        }
+    }
+
+    private void parseUsers(String[] split){
+        List<String> contact = new ArrayList<>(Arrays.asList(split));
+//        contact.set(0, "ALL");
+
+        contact.remove(0);
+        contact.remove(user);
+        contact.removeIf(s -> list.contains(s));
+
+        list.addAll(contact);
+        contacts.setItems(FXCollections.observableList(list));
+    }
+
+    private void authOk(String[] split){
+        user = split[1];
+        loginPanel.setVisible(false);
+        Application.primaryStage.setTitle("Chatterbox - " + user);
+        mainPanel.setVisible(true);
+    }
+
+    public void sendChangeNick(ActionEvent actionEvent) {
+        //@TODO
+    }
+
+    public void returnToChat(ActionEvent actionEvent) {
+        //@TODO
+    }
+
+    public void sendChangePass(ActionEvent actionEvent) {
+        //@TODO
+    }
+
+    public void sendAuth(ActionEvent actionEvent) {
+        String login = LoginField.getText();
+        String password = PasswordField.getText();
+
+        if (login.isBlank() || password.isBlank()){
+            return;
+        }
+        String msg = AUTH_MESSAGE.getCommand() + REGEX + login + REGEX + password;
+
+        try{
+            if (!networkService.isConnected()) {
+                networkService.connect();
+
+            }
+            networkService.sendMessage(msg);
+        }catch (IOException e){
+            showError("Network error.");
+        }
     }
 }
