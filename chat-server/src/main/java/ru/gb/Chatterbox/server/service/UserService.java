@@ -7,7 +7,7 @@ public interface UserService {
     void stop();
     String authenticate(String login, String password);
     String changeNick(String login, String newNick);
-    User createUser(String login, String password, String newNick);
+    String createUser(String login, String password, String newNick);
     void deleteUser(String login, String password);
     void changePassword(String login, String password, String newPassword);
 }

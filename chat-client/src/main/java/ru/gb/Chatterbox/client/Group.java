@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Group implements Target {
+public class Group{
 //    private final ArrayList<User> users = new ArrayList<>();
     private final Map <String, User> users = new HashMap<>();
     private String title;
