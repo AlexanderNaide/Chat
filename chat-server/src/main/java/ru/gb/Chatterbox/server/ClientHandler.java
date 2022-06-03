@@ -95,6 +95,30 @@ public class ClientHandler {
                         server.addHandler(this);
                         break;
                     }
+                } else if (msg.startsWith(CREATE_MESSAGE.getCommand())){
+                    String[] parsed = msg.split(REGEX);
+                    String response = "";
+                    String nickname = null;
+
+                    try{
+                        nickname = server.getUserService().createUser(parsed[1], parsed[2], parsed[3]);
+                    } catch (WrongCredentialsException e){
+                        response = ERROR_MESSAGE.getCommand() + REGEX + e.getMessage();
+                        System.out.println("Wrong credentials: " + parsed[1]);
+                    }
+/*                    if(server.isUserAlreadyOnline(nickname)){
+                        response = ERROR_MESSAGE.getCommand() + REGEX + "This client already connected.";
+                        System.out.println("Already connected.");
+                    }*/
+
+                    if (!response.equals("")){
+                        send(response);
+                    } else {
+                        this.user = nickname;
+                        send(AUTH_OK.getCommand() + REGEX + nickname);
+                        server.addHandler(this);
+                        break;
+                    }
                 }
             }
         } catch (IOException e){

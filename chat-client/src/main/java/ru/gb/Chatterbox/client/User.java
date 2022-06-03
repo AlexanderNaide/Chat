@@ -1,11 +1,18 @@
 package ru.gb.Chatterbox.client;
 
-public class User implements target{
+public class User {
 
     private String nick;
     private String name;
     private boolean isOnLine;
     private boolean isNew;
+
+    public User(){
+    }
+
+    public User(String nick){
+        this.nick = nick;
+    }
 
     public User(String nick, boolean isNew){
         this.nick = nick;

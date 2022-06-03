@@ -1,10 +1,13 @@
 package ru.gb.Chatterbox.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class Group implements target{
-    private final ArrayList<User> users = new ArrayList<>();
+public class Group{
+//    private final ArrayList<User> users = new ArrayList<>();
+    private final Map <String, User> users = new HashMap<>();
     private String title;
     private boolean unfold;
 
@@ -39,10 +42,16 @@ public class Group implements target{
     }
 
     public void add(User name){
-        users.add(name);
+        users.put(name.getNick(), name);
     }
 
-    public ArrayList <User> getUsers(){
+    public void addAll(List<String> name){
+        for (String s : name) {
+            users.put(s, new User(s));
+        }
+    }
+
+    public Map <String, User> getUsers(){
         return users;
     }
 }
