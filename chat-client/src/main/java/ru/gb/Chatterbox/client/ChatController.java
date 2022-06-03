@@ -114,13 +114,9 @@ public class ChatController implements Initializable, MessageProcessor {
             if (text == null || text.isBlank()) {
                 return;
             }
-
             MultipleSelectionModel<TreeItem<String>> selectionModel = contactPanel.getSelectionModel();
-
             selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
-
             StringBuilder forMessage = new StringBuilder();
-
             if(selectionModel.isEmpty()){
                 networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text);
                 forMessage.append(" ").append("ALL");
@@ -128,9 +124,6 @@ public class ChatController implements Initializable, MessageProcessor {
                 for (TreeItem<String> item : selectionModel.getSelectedItems()) {
                     String[] split = item.getValue().split(" ");
                     String recipient = split[1];
-//->
-                    System.out.println(recipient);
-
                     forMessage.append(" ").append(recipient).append(",");
                     if (groups.containsKey(recipient)) {
                         for (String s : groups.get(recipient).getUsers().keySet()) {
