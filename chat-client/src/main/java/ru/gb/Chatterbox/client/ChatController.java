@@ -5,6 +5,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -36,7 +37,6 @@ import static ru.gb.Chatterbox.enums.Command.*;
 public class ChatController implements Initializable, MessageProcessor {
 
     public TreeView <String> contactPanel;
-//    public TreeView <itemString> contactPanel;
     public AnchorPane anchorPane;
     public VBox registrationPanel;
     public TextField newLoginField;
@@ -98,7 +98,6 @@ public class ChatController implements Initializable, MessageProcessor {
 
 //    private static ObservableList <target> list;
 
-//    TreeItem <itemString> root;
     TreeItem <String> root;
 
     public void mockAction(ActionEvent actionEvent) {
@@ -182,191 +181,71 @@ public class ChatController implements Initializable, MessageProcessor {
             downloadUsers(usersArchive, allUsers);
         }
         setItems();
-
-//        list = FXCollections.observableArrayList();
-
-/*        for (Group g : groups) {
-            list.add(g.getTitle());
-            if (g.getUnfold()) {
-                for (User user : g.getUsers()) {
-                    if (!this.user.equals(user.getNick())) {
-                        list.add(user.getName(user.getNick()));
-                    }
-                }
-            }
-        }*/
-
-//        contacts.setItems(list);
-
-/*        contacts.setOnMouseClicked(e -> {
-
-            if(mouseEvent.getClickCount() == 2){
-                System.out.println("Double clicked");
-            }
-
-            for (Group g: groups){
-                if (g.getTitle().equals(contacts.getFocusModel().getFocusedItem())){
-                    if (g.isUnfold()){
-                        g.setUnfold(false);
-                        for(Name n: g.getGroup()){
-                            list.remove(n.getName());
-                        }
-                    } else {
-                        g.setUnfold(true);
-                        for(Name n: g.getGroup()){
-                            list.add(n.getName());
-                        }
-                    }
-                }
-            }
-        });*/
     }
 
-    TreeCell<String> treeCell = new TreeCell<>();
-
     private void setItems() {
-/*
-
-*//*
-*//*        root = new TreeItem<>();
-        for (Group g : groups.values()) {
-//            TreeItem <String> item = new TreeItem<>(g.toString());
-            TreeItem <itemString> item = new TreeItem<itemString>(new itemString(g.toString(), "style1"));
-            root.getChildren().add(item);
-            for (String s : g.getUsers().keySet()) {
-                final TreeItem <itemString> childrenItem = new TreeItem<>(new itemString(s, "style2"));
-                item.getChildren().add(childrenItem);
-            }
-            root.setExpanded(g.getUnfold());
-        }
-        root.setExpanded(true);*//**//*
-
-
         root = new TreeItem<>();
         for (Group g : groups.values()) {
-//            TreeItem <String> item = new TreeItem<>(g.toString());
-            TreeItem <itemString> item = new TreeItem<itemString>(new itemString(g.toString(), "style1"));
-            root.getChildren().add(item.getValue().getText());
+            TreeItem <String> item = new TreeItem<>();
+            if (g.getTitle().equals("Все")  && groups.get("Все").getUsers().isEmpty()){
+                item.setValue("grOff " + g.getTitle());
+            } else {
+                for (String nick : g.getUsers().keySet()) {
+                    if (groups.get("Все").getUsers().containsKey(nick) && !groups.get("Все").getUsers().isEmpty()) {
+                        item.setValue("grOn " + g.getTitle());
+                        break;
+                    } else {
+                        item.setValue("grOff " + g.getTitle());
+                    }
+                }
+            }
+            root.getChildren().add(item);
             for (String s : g.getUsers().keySet()) {
-                final TreeItem <itemString> childrenItem = new TreeItem<>(new itemString(s, "style2"));
-//                final TreeItem <String> childrenItem = new TreeItem<>(new itemString(s, "style2"));
+                TreeItem <String> childrenItem;
+                if (groups.get("Все").getUsers().containsKey(s)){
+                    childrenItem = new TreeItem<>("usOn " + s);
+                } else {
+                    childrenItem = new TreeItem<>("usOff " + s);
+                }
                 item.getChildren().add(childrenItem);
             }
             root.setExpanded(g.getUnfold());
         }
         root.setExpanded(true);
+        contactPanel.setShowRoot(false);
+        contactPanel.setRoot(root);
+        contactPanel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-
-        List<String> allTreeItemStyles = Arrays.asList("style1", "style2", "style3");
-
-                contactPanel.setCellFactory(tv ->  new TreeCell<String>() {
+        contactPanel.setCellFactory(tv -> new TreeCell<String>() {
             @Override
-            public void updateItem(String item, boolean empty) {
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                getStyleClass().removeAll(allTreeItemStyles);
-                if (empty) {
+                if (empty || item == null) {
+
                     setText("");
                 } else {
-                    setText(tv.getEditingItem().getValue().getText()); // appropriate text for item
-                    String styleClass = "style1" ; // choose style class for item
-                    getStyleClass().add(styleClass);
+                    String[] row = item.split(" ");
+                    switch (row[0]){
+                        case "grOn" -> {
+                            setText(row[1]);
+                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
+                        }
+                        case "usOn" -> {
+                            setText(row[1]);
+                            setStyle(" -fx-font-style: italic;");
+                        }
+                        case "usOff" -> {
+                            setText(row[1]);
+                            setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
+                        }
+                        default -> {
+                            setText(row[1]);
+                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+                        }
+                    }
                 }
             }
         });
-*//*
-
-
-*//*        contactPanel.setCellFactory(tv ->  new TreeCell<String>() {
-            @Override
-            public void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                getStyleClass().removeAll(allTreeItemStyles);
-                if (empty) {
-                    setText("");
-                } else {
-                    setText(""); // appropriate text for item
-                    String styleClass = "style1" ; // choose style class for item
-                    getStyleClass().add(styleClass);
-                }
-            }
-        });*//*
-
-
-        contactPanel.setRoot(root);
-
-
-
-//        contactPanel.setCellFactory(tv ->  new TreeCell<String>() {
-//            @Override
-//            public void updateItem(String item, boolean empty) {
-//                super.updateItem(item, empty);
-//                if(!getStyleClass().contains("style1")){
-//                    getStyleClass().add("style1");
-//                }
-//                if(!getStyleClass().contains("style2")){
-//                    getStyleClass().add("style2");
-//                }
-//                if(!getStyleClass().contains("style3")){
-//                    getStyleClass().add("style3");
-//                }
-
-
-//                root = new TreeItem<>();
-//                for (Group g : groups.values()) {
-//                    TreeItem <String> item2 = new TreeItem<>(g.toString());
-//                    root.getChildren().add(item2);
-////                    String styleClass = "style1" ; // choose style class for item
-////                    getStyleClass().add(styleClass);
-////                    for (String s : g.getUsers().keySet()) {
-////                        final TreeItem <String> childrenItem = new TreeItem<>(s);
-////                        item.getChildren().add(childrenItem);
-////                    }
-//                    root.setExpanded(g.getUnfold());
-//                }
-
-
-//                if (empty) {
-////                    setText("fffffffffffffffff");
-//                    String styleClass = "style2" ;
-//                    getStyleClass().add(styleClass);
-//                } else {
-////                    contactPanel.setRoot(root);
-//                }
-//            }
-//        });
-
-
-//        root = new TreeItem<>();
-//        for (Group g : groups.values()) {
-//            TreeItem <String> item = new TreeItem<>(g.toString());
-//            root.getChildren().add(item);
-//            for (String s : g.getUsers().keySet()) {
-//                final TreeItem <String> childrenItem = new TreeItem<>(s);
-//                item.getChildren().add(childrenItem);
-//            }
-//            root.setExpanded(g.getUnfold());
-//        }
-//        root.setExpanded(true);
-//        contactPanel.setRoot(root);
-        contactPanel.setShowRoot(false);
-        contactPanel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    }*/
-
-//    private void setItems() {
-        root = new TreeItem<>();
-        for (Group g : groups.values()) {
-            TreeItem <String> item = new TreeItem<>(g.toString());
-            root.getChildren().add(item);
-            for (String s : g.getUsers().keySet()) {
-                TreeItem <String> childrenItem = new TreeItem<>(s);
-                item.getChildren().add(childrenItem);
-            }
-            root.setExpanded(g.getUnfold());
-        }
-        root.setExpanded(true);
-        contactPanel.setShowRoot(false);
-        contactPanel.setRoot(root);
-        contactPanel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     private void downloadUsers(File usersArchive, Group allUsers) {
