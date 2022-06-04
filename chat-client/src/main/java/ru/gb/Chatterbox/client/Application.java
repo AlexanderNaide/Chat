@@ -5,8 +5,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-
 public class Application extends javafx.application.Application {
     public static Stage primaryStage;
 

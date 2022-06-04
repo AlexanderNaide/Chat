@@ -21,11 +21,6 @@ public class inMemoryUserServiceImpl implements UserService {
         File usersArchive = new File(String.valueOf(getClass().getResource("users.txt")));
 
         if(usersArchive.length() == 0){
-//            allUsers.add(new User("log1", "pass1", "nick1"));
-//            allUsers.add(new User("log2", "pass2", "nick2"));
-//            allUsers.add(new User("log3", "pass3", "nick3"));
-//            allUsers.add(new User("log4", "pass4", "nick4"));
-//            allUsers.add(new User("log5", "pass5", "nick5"));
 
             allUsers.put("nick1", new User("log1", "pass1", "nick1"));
             allUsers.put("nick2", new User("log2", "pass2", "nick2"));

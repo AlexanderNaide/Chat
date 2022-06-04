@@ -1,11 +1,6 @@
 package ru.gb.Chatterbox.client;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,31 +10,35 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
 
-import javax.swing.event.ChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-import static javafx.scene.control.PopupControl.USE_COMPUTED_SIZE;
 import static ru.gb.Chatterbox.client.Application.primaryStage;
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 
 public class ChatController implements Initializable, MessageProcessor {
 
+    @FXML
     public TreeView <String> contactPanel;
+
+    @FXML
     public AnchorPane anchorPane;
+
+    @FXML
     public VBox registrationPanel;
+
+    @FXML
     public TextField newLoginField;
+
+    @FXML
     public TextField newPasswordField;
 
     @FXML
@@ -95,8 +94,6 @@ public class ChatController implements Initializable, MessageProcessor {
     private String user;
 
     private static Map <String, Group> groups;
-
-//    private static ObservableList <target> list;
 
     TreeItem <String> root;
 
@@ -268,6 +265,7 @@ public class ChatController implements Initializable, MessageProcessor {
 
         Platform.runLater(() -> parseMessage(message));
     }
+
     private void parseMessage(String message){
 
         String[] split = message.split(REGEX);
@@ -283,8 +281,6 @@ public class ChatController implements Initializable, MessageProcessor {
 
     private void parseUsers(String[] split){
         List<String> contact = new ArrayList<>(Arrays.asList(split));
-//        contact.set(0, "ALL");
-
         contact.remove(0);
         contact.remove(user);
         contact.removeIf(s -> groups.get("Все").getUsers().containsKey(s));
