@@ -1,5 +1,6 @@
 package ru.gb.Chatterbox.server;
 
+import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 import ru.gb.Chatterbox.enums.Command;
 import ru.gb.Chatterbox.server.error.WrongCredentialsException;
 
@@ -28,10 +29,51 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
             System.out.println("Handler created.");
+            waitingForAuthorization();
         } catch (IOException e){
             System.err.println("Connection problems with user: " + user);
         }
     }
+
+    /*
+    * Работает в параллельном потоке, если пользователь авторизуется за 120 с. цикл прерывается,
+    * если же нет - отправляет пользователю сообщение об истекшем тайм-ауте и закрывает текущий
+    * поток пользователя. По данной логике хорошо бы еще на стороне клиента тригериться по такому сообщению и
+    * делать выход из приложения, но в задании такого небыло, а из итогового приложения я это
+    * выпилю (если Вы не против))), тем более, что хочу сделать у клиента кнопку LogIN/LogOUT,
+    * и это выбрасывание будет мешать.
+    *
+    * Но вот по мне будет логичным сделать счетчик неудачных попыток
+    * и после, например, 5 неудачных попыток запрет на авторизацию минут на 5. Но для этого,
+    * хорошо бы, если бы Вы подсказали, как запилинговаться на конкретную машину в сети.
+    * (но я буду еще думать над этим вопросом, пока понимаю только, что делать такой таймаут
+    * просто в handlerThread не совсем логично - т.к. новый socket - новый handler.
+    * Нужно получить уникальный идентификатор машины или клиентского приложения - это я еще придумаю)
+    */
+    public void waitingForAuthorization(){
+        Thread waiting = new Thread(() -> {
+            long timeStart = System.currentTimeMillis();
+            while (user == null && System.currentTimeMillis() - timeStart < 120000){
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (user == null){
+                String response = ERROR_MESSAGE.getCommand() + REGEX + "The connection timeout has expired.";
+                send(response);
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Thread.currentThread().interrupt();
+            }
+        });
+        waiting.start();
+    }
+
 
     public void handle(){
         handlerThread = new Thread(() -> {
