@@ -4,9 +4,7 @@ import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 import ru.gb.Chatterbox.enums.Command;
 import ru.gb.Chatterbox.server.error.WrongCredentialsException;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 
@@ -35,6 +33,18 @@ public class ClientHandler {
         }
     }
 
+    private void shutdown(){
+        try {
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Thread.currentThread().interrupt();
+    }
+
     /*
     * Работает в параллельном потоке, если пользователь авторизуется за 120 с. цикл прерывается,
     * если же нет - отправляет пользователю сообщение об истекшем тайм-ауте и закрывает текущий
@@ -53,7 +63,7 @@ public class ClientHandler {
     public void waitingForAuthorization(){
         Thread waiting = new Thread(() -> {
             long timeStart = System.currentTimeMillis();
-            while (user == null && System.currentTimeMillis() - timeStart < 120000){
+            while (user == null && System.currentTimeMillis() - timeStart < 12000){
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -63,12 +73,7 @@ public class ClientHandler {
             if (user == null){
                 String response = ERROR_MESSAGE.getCommand() + REGEX + "The connection timeout has expired.";
                 send(response);
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Thread.currentThread().interrupt();
+                shutdown();
             }
         });
         waiting.start();
