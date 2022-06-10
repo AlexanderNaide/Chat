@@ -1,16 +1,20 @@
 package ru.gb.Chatterbox.client;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import ru.gb.Chatterbox.client.lang.Language;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
@@ -21,6 +25,8 @@ import java.net.URL;
 import java.util.*;
 
 import static ru.gb.Chatterbox.client.Application.primaryStage;
+import static ru.gb.Chatterbox.client.lang.lang.ENGLISH;
+import static ru.gb.Chatterbox.client.lang.lang.RUSSIAN;
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 
@@ -40,6 +46,23 @@ public class ChatController implements Initializable, MessageProcessor {
 
     @FXML
     public TextField newPasswordField;
+    public CheckMenuItem englishSel;
+    public CheckMenuItem russianSel;
+    public ToggleGroup langAutGroup;
+    public ToggleGroup langRegGroup;
+    public ToggleButton setAEnglish;
+    public ToggleButton setARussian;
+    public ToggleButton setREnglish;
+    public ToggleButton setRRussian;
+    public Label labelRegOnLogin;
+    public Label labelLoginOnLogin;
+    public Label labelPasswordOnLogin;
+    public Button buttonConnectOnLogin;
+    public Label labelAuthOnReg;
+    public Label labelLoginOnReg;
+    public Label labelPasswordOnLReg;
+    public Label labelNickOnLReg;
+    public Button buttonRegOnReg;
 
     @FXML
     private Button add;
@@ -87,7 +110,7 @@ public class ChatController implements Initializable, MessageProcessor {
     private TextField inputField;
 
     @FXML
-    private Button btnSend;
+    public Button btnSend;
 
     private NetworkService networkService;
 
@@ -96,6 +119,12 @@ public class ChatController implements Initializable, MessageProcessor {
     private static Map <String, Group> groups;
 
     TreeItem <String> root;
+
+    private Language language;
+
+    private double cellSize;
+
+    private ObservableList<TreeItem<String>> movingContacts;
 
     public void mockAction(ActionEvent actionEvent) {
         System.out.println("mock");
@@ -134,11 +163,11 @@ public class ChatController implements Initializable, MessageProcessor {
                     forMessage.deleteCharAt(forMessage.length() - 1);
                 }
             }
-            text = "[Message for" + forMessage + ":] " + text;
+            text = language.text("[Message for") + forMessage + ":] " + text;
             chatArea.appendText(text + System.lineSeparator());
             inputField.clear();
         }catch (IOException e){
-            showError("Network error.");
+            showError(language.text("Network error."));
         }
     }
 
@@ -154,9 +183,10 @@ public class ChatController implements Initializable, MessageProcessor {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         networkService = new NetworkService(this);
-
+        language = new Language(this);
+        cellSize = 25.0;
         groups = new HashMap<>();
-        Group allUsers = new Group("Все");
+        Group allUsers = new Group("ALL");
         groups.put(allUsers.getTitle(), allUsers);
 
         // необязательные группы
@@ -182,14 +212,18 @@ public class ChatController implements Initializable, MessageProcessor {
     }
 
     private void setItems() {
+        if (contactPanel.getRoot() != null){
+        runContact();
+        }
+
         root = new TreeItem<>();
         for (Group g : groups.values()) {
             TreeItem <String> item = new TreeItem<>();
-            if (g.getTitle().equals("Все")  && groups.get("Все").getUsers().isEmpty()){
+            if (g.getTitle().equals("ALL")  && groups.get("ALL").getUsers().isEmpty()){
                 item.setValue("grOff " + g.getTitle());
             } else {
                 for (String nick : g.getUsers().keySet()) {
-                    if (groups.get("Все").getUsers().containsKey(nick) && !groups.get("Все").getUsers().isEmpty()) {
+                    if (groups.get("ALL").getUsers().containsKey(nick) && !groups.get("ALL").getUsers().isEmpty()) {
                         item.setValue("grOn " + g.getTitle());
                         break;
                     } else {
@@ -198,18 +232,18 @@ public class ChatController implements Initializable, MessageProcessor {
                 }
             }
             root.getChildren().add(item);
+            item.setExpanded(g.getUnfold());
             for (String s : g.getUsers().keySet()) {
                 TreeItem <String> childrenItem;
-                if (groups.get("Все").getUsers().containsKey(s)){
+                if (groups.get("ALL").getUsers().containsKey(s)){
                     childrenItem = new TreeItem<>("usOn " + s);
                 } else {
                     childrenItem = new TreeItem<>("usOff " + s);
                 }
                 item.getChildren().add(childrenItem);
             }
-            root.setExpanded(g.getUnfold());
         }
-        root.setExpanded(true);
+        contactPanel.setFixedCellSize(cellSize);
         contactPanel.setShowRoot(false);
         contactPanel.setRoot(root);
         contactPanel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -224,25 +258,32 @@ public class ChatController implements Initializable, MessageProcessor {
                     String[] row = item.split(" ");
                     switch (row[0]){
                         case "grOn" -> {
-                            setText(row[1]);
+                            setText(language.text(row[1]));
                             setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
                         }
                         case "usOn" -> {
-                            setText(row[1]);
+                            setText(language.text(row[1]));
                             setStyle(" -fx-font-style: italic;");
                         }
                         case "usOff" -> {
-                            setText(row[1]);
+                            setText(language.text(row[1]));
                             setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
                         }
                         default -> {
-                            setText(row[1]);
+                            setText(language.text(row[1]));
                             setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
                         }
                     }
                 }
             }
         });
+    }
+
+    public void runContact(){
+        for (TreeItem<String> a : contactPanel.getRoot().getChildren()) {
+            Group g = groups.get(a.getValue().substring(a.getValue().indexOf(" ") + 1));
+            g.setUnfold(a.expandedProperty().getValue());
+        }
     }
 
     private void downloadUsers(File usersArchive, Group allUsers) {
@@ -283,8 +324,8 @@ public class ChatController implements Initializable, MessageProcessor {
         List<String> contact = new ArrayList<>(Arrays.asList(split));
         contact.remove(0);
         contact.remove(user);
-        contact.removeIf(s -> groups.get("Все").getUsers().containsKey(s));
-        groups.get("Все").addAll(contact);
+        contact.removeIf(s -> groups.get("ALL").getUsers().containsKey(s));
+        groups.get("ALL").addAll(contact);
         setItems();
     }
 
@@ -311,13 +352,13 @@ public class ChatController implements Initializable, MessageProcessor {
 
     public void sendAuthorisationWindow(MouseEvent mouseEvent) {
         registrationPanel.setVisible(false);
-        primaryStage.setTitle("Authorization");
+        primaryStage.setTitle("Chatterbox");
         loginPanel.setVisible(true);
     }
 
     public void sendRegistrationWindow(MouseEvent mouseEvent) {
         loginPanel.setVisible(false);
-        primaryStage.setTitle("Registration");
+        primaryStage.setTitle("Chatterbox");
         registrationPanel.setVisible(true);
     }
 
@@ -359,4 +400,123 @@ public class ChatController implements Initializable, MessageProcessor {
             showError("Network error.");
         }
     }
+
+    public void selectEnglish(ActionEvent actionEvent) {
+        langAutGroup.selectToggle(setAEnglish);
+        langRegGroup.selectToggle(setREnglish);
+        language.redrawing(ENGLISH.getLanguage());
+        englishSel.setSelected(true);
+        russianSel.setSelected(false);
+    }
+
+    public void selectRussian(ActionEvent actionEvent) {
+        langAutGroup.selectToggle(setARussian);
+        langRegGroup.selectToggle(setRRussian);
+        language.redrawing(RUSSIAN.getLanguage());
+        russianSel.setSelected(true);
+        englishSel.setSelected(false);
+    }
+
+    //*************   Изучаемые события   ***************
+
+    public void OnMouseReleased(MouseEvent mouseEvent) {
+        if (movingContacts != null){
+            double n = mouseEvent.getY();
+            if (n > contactPanel.getExpandedItemCount() * cellSize){
+                n = (contactPanel.getExpandedItemCount() * cellSize) - 1.0;
+            }
+            int nom = (int) (n/cellSize);
+            String parent;
+            if (contactPanel.getTreeItem(nom).getParent().getValue() == null){
+                parent = contactPanel.getTreeItem(nom).getValue();
+            } else {
+                parent = contactPanel.getTreeItem(nom).getParent().getValue();
+            }
+            parent = parent.substring(parent.indexOf(" ") + 1);
+            for (TreeItem<String> item : movingContacts){
+                if (item.getParent().getValue() == null){
+                    break;
+                }
+                Group donorG = groups.get(item.getParent().getValue().substring(item.getParent().getValue().indexOf(" ") + 1));
+                if (donorG.getTitle().equals(parent)){
+                    break;
+                }
+                User user = groups.get(donorG.getTitle()).getUsers().get(item.getValue().substring(item.getValue().indexOf(" ") + 1));
+
+                groups.get(parent).add(user);
+                if (!donorG.getTitle().equals("ALL")){
+                    donorG.remove(user);
+                }
+            }
+        movingContacts = null;
+        setItems();
+        }
+    }
+
+    public void OnMouseDragger(MouseEvent mouseEvent) {
+
+        double n = mouseEvent.getY();
+        if (n >= contactPanel.getExpandedItemCount() * cellSize){
+            n = (contactPanel.getExpandedItemCount() * cellSize) - 1.0;
+        }
+        int nom = (int) (n/cellSize);
+        int nomF = 0;
+
+        for (int i = nom; i > 0; i--) {
+            if (contactPanel.getTreeItem(i).getParent().getValue() == null){
+                nomF = i;
+                break;
+            }
+        }
+        final int[] count = new int[1];
+
+        int finalNomF = nomF;
+        contactPanel.setCellFactory(tv -> new TreeCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText("");
+                } else {
+                    String[] row = item.split(" ");
+                    switch (row[0]){
+                        case "grOn" -> {
+                            setText(language.text(row[1]));
+                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
+                            if (finalNomF == count[0]){
+                                setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic;");
+                            }
+                        }
+                        case "usOn" -> {
+                            setText(language.text(row[1]));
+                            setStyle(" -fx-font-style: italic;");
+                        }
+                        case "usOff" -> {
+                            setText(language.text(row[1]));
+                            setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
+                        }
+                        default -> {
+                            setText(language.text(row[1]));
+                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+                            if (finalNomF == count[0]){
+                                setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+                            }
+                        }
+                    }
+                    count[0]++;
+                }
+            }
+        });
+
+    }
+
+    public void OnActionDel(ActionEvent actionEvent) {
+    }
+
+    public void OnDragDetectedbuttonDel(MouseEvent mouseEvent) {
+    }
+
+    public void OnMousePressedDel(MouseEvent mouseEvent) {
+    }
+
 }

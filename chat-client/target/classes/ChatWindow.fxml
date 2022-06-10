@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ButtonBar?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TreeView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="anchorPane" maxHeight="539.0" maxWidth="646.0" minHeight="200.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.gb.Chatterbox.client.ChatController">
+<AnchorPane fx:id="anchorPane" maxHeight="539.0" maxWidth="646.0" minHeight="235.0" minWidth="300.0" prefHeight="235.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.gb.Chatterbox.client.ChatController">
 
 
-    <VBox fx:id="loginPanel" minHeight="200.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0">
-        <Label text="Login:">
+    <VBox fx:id="loginPanel" minHeight="235.0" minWidth="300.0" prefHeight="235.0" prefWidth="300.0">
+      <HBox prefHeight="35.0" prefWidth="300.0">
+         <children>
+              <Label fx:id="labelRegOnLogin" accessibleRole="BUTTON" contentDisplay="BOTTOM" onMouseClicked="#sendRegistrationWindow" prefHeight="25.0" prefWidth="100.0" text="Registration">
+                  <opaqueInsets>
+                      <Insets />
+                  </opaqueInsets>
+              </Label>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+
+               <children>
+                  <ToggleButton fx:id="setAEnglish" mnemonicParsing="false" onAction="#selectEnglish" selected="true" text="En">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="langAutGroup" />
+                     </toggleGroup>
+                  </ToggleButton>
+                  <ToggleButton fx:id="setARussian" mnemonicParsing="false" onAction="#selectRussian" text="Ру" toggleGroup="$langAutGroup" />
+               </children>
+
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+        <Label fx:id="labelLoginOnLogin" text="Login:">
             <padding>
                 <Insets top="5.0" />
             </padding>
@@ -29,7 +43,7 @@
             <VBox.margin>
                 <Insets left="5.0" right="5.0" />
             </VBox.margin></TextField>
-        <Label text="Password:">
+        <Label fx:id="labelPasswordOnLogin" text="Password:">
             <VBox.margin>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </VBox.margin></Label>
@@ -38,23 +52,39 @@
                 <Insets bottom="5.0" left="5.0" right="5.0" />
             </VBox.margin>
         </TextField>
-        <Button onAction="#sendAuth" text="Connect">
+        <Button fx:id="buttonConnectOnLogin" minWidth="120.0" onAction="#sendAuth" prefWidth="120.0" text="Connect">
             <VBox.margin>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                <Insets left="5.0" top="55.0" />
             </VBox.margin></Button>
-        <Label accessibleRole="BUTTON" alignment="TOP_RIGHT" contentDisplay="BOTTOM" onMouseClicked="#sendRegistrationWindow" prefHeight="26.0" prefWidth="150.0" text="Registration" textAlignment="RIGHT">
-            <VBox.margin>
-                <Insets bottom="5.0" left="45.0" top="25.0" />
-            </VBox.margin>
-            <opaqueInsets>
-                <Insets />
-            </opaqueInsets>
-        </Label>
     </VBox>
 
 
-    <VBox fx:id="registrationPanel" minHeight="200.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" visible="false">
-        <Label text="Login:">
+    <VBox fx:id="registrationPanel" minHeight="235.0" minWidth="200.0" prefHeight="235.0" prefWidth="300.0" visible="false">
+      <HBox prefHeight="35.0" prefWidth="300.0">
+         <children>
+               <Label fx:id="labelAuthOnReg" accessibleRole="BUTTON" contentDisplay="BOTTOM" onMouseClicked="#sendAuthorisationWindow" prefHeight="25.0" prefWidth="100.0" text="Authorization">
+                   <HBox.margin>
+                       <Insets />
+                   </HBox.margin>
+               </Label>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+
+               <children>
+                  <ToggleButton fx:id="setREnglish" mnemonicParsing="false" onAction="#selectEnglish" selected="true" text="En">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="langRegGroup" />
+                     </toggleGroup></ToggleButton>
+                  <ToggleButton fx:id="setRRussian" mnemonicParsing="false" onAction="#selectRussian" text="Ру" toggleGroup="$langRegGroup" />
+               </children>
+
+
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+        <Label fx:id="labelLoginOnReg" text="Login:">
             <VBox.margin>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </VBox.margin>
@@ -67,7 +97,7 @@
                 <Insets left="5.0" right="5.0" />
             </VBox.margin>
         </TextField>
-        <Label text="Password:">
+        <Label fx:id="labelPasswordOnLReg" text="Password:">
             <VBox.margin>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </VBox.margin>
@@ -77,7 +107,7 @@
                 <Insets bottom="5.0" left="5.0" right="5.0" />
             </VBox.margin>
         </TextField>
-        <Label text="Nickname">
+        <Label fx:id="labelNickOnLReg" text="Nickname">
             <VBox.margin>
                 <Insets bottom="5.0" left="5.0" right="5.0" />
             </VBox.margin>
@@ -87,18 +117,11 @@
                 <Insets bottom="5.0" left="5.0" right="5.0" />
             </VBox.margin>
         </TextField>
-        <HBox prefHeight="100.0" prefWidth="200.0">
-            <Button onAction="#sendReg" text="Registration">
-                <HBox.margin>
-                    <Insets left="5.0" right="10.0" />
-                </HBox.margin>
-            </Button>
-            <Label accessibleRole="BUTTON" alignment="BOTTOM_RIGHT" contentDisplay="BOTTOM" onMouseClicked="#sendAuthorisationWindow" prefHeight="26.0" prefWidth="100.0" text="Authorization" textAlignment="RIGHT">
-                <HBox.margin>
-                    <Insets right="5.0" />
-                </HBox.margin>
-            </Label>
-        </HBox>
+         <Button fx:id="buttonRegOnReg" minWidth="150.0" onAction="#sendReg" prefWidth="80.0" text="Register">
+         <VBox.margin>
+            <Insets bottom="5.0" left="5.0" top="3.0" />
+         </VBox.margin>
+         </Button>
     </VBox>
 
 
@@ -142,7 +165,12 @@
             </Menu>
 
             <Menu text="Edit">
-                <MenuItem onAction="#mockAction" text="Open" />
+            <Menu mnemonicParsing="false" text="Language">
+              <items>
+                  <CheckMenuItem fx:id="englishSel" mnemonicParsing="false" onAction="#selectEnglish" selected="true" text="English" />
+                  <CheckMenuItem fx:id="russianSel" mnemonicParsing="false" onAction="#selectRussian" text="Русский" />
+              </items>
+            </Menu>
                 <MenuItem onAction="#mockAction" text="Connect" />
                 <MenuItem onAction="#mockAction" text="Something" />
                 <MenuItem onAction="#mockAction" text="Exit" />
@@ -174,7 +202,7 @@
                     <Insets right="6.0" top="6.0" />
                 </HBox.margin>
 
-                <TreeView fx:id="contactPanel" prefHeight="400.0" prefWidth="200.0" />
+                <TreeView fx:id="contactPanel" onDragDetected="#OnDragDetected" onDragEntered="#OnDragEntered" onMouseDragged="#OnMouseDragger" onMousePressed="#OnMousePressed" onMouseReleased="#OnMouseReleased" prefHeight="400.0" prefWidth="200.0" />
 
 <!--                <ListView fx:id="contacts" prefHeight="400.0" prefWidth="200.0">
 
@@ -183,7 +211,7 @@
               <buttons>
                   <Button fx:id="add" alignment="TOP_CENTER" lineSpacing="5.0" minWidth="36.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="61.0" text="+" textAlignment="CENTER" />
                   <Button fx:id="addGroup" contentDisplay="CENTER" maxWidth="60.0" minWidth="40.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="40.0" text="++" textAlignment="CENTER" />
-                  <Button fx:id="del" contentDisplay="RIGHT" minWidth="35.0" mnemonicParsing="false" prefHeight="25.0" text="-" textAlignment="CENTER">
+                  <Button fx:id="del" contentDisplay="RIGHT" minWidth="35.0" mnemonicParsing="false" onAction="#OnActionDel" onDragDetected="#OnDragDetectedbuttonDel" onMousePressed="#OnMousePressedDel" prefHeight="25.0" text="-" textAlignment="CENTER">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets></Button>
