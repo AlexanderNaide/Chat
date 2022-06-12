@@ -3,27 +3,32 @@ package ru.gb.Chatterbox.client;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import ru.gb.Chatterbox.client.lang.Language;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
 
+import javax.imageio.ImageIO;
+import java.awt.geom.Point2D;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import static javafx.scene.Cursor.*;
 import static ru.gb.Chatterbox.client.Application.primaryStage;
 import static ru.gb.Chatterbox.client.lang.lang.ENGLISH;
 import static ru.gb.Chatterbox.client.lang.lang.RUSSIAN;
@@ -63,6 +68,7 @@ public class ChatController implements Initializable, MessageProcessor {
     public Label labelPasswordOnLReg;
     public Label labelNickOnLReg;
     public Button buttonRegOnReg;
+    public Cursor cursor;
 
     @FXML
     private Button add;
@@ -450,7 +456,13 @@ public class ChatController implements Initializable, MessageProcessor {
             }
         movingContacts = null;
         setItems();
+        contactPanel.setCursor(DEFAULT);
         }
+    }
+
+    public void OnDragDetected(MouseEvent mouseEvent) {
+        movingContacts = contactPanel.getSelectionModel().getSelectedItems();
+        contactPanel.setCursor(CLOSED_HAND);
     }
 
     public void OnMouseDragger(MouseEvent mouseEvent) {
