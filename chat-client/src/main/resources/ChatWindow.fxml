@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -198,7 +197,7 @@
                     <Insets left="6.0" right="6.0" top="6.0" />
                 </HBox.margin>
             </TextArea>
-            <VBox prefWidth="150.0">
+            <VBox fx:id="componentContactList" prefWidth="150.0">
                 <HBox.margin>
                     <Insets right="6.0" top="6.0" />
                 </HBox.margin>

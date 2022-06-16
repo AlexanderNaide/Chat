@@ -7,10 +7,16 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
@@ -21,12 +27,20 @@ import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+//import java.awt.*;
+import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.IntBuffer;
 import java.util.*;
+import java.util.List;
 
 import static javafx.scene.Cursor.*;
 import static ru.gb.Chatterbox.client.Application.primaryStage;
@@ -69,6 +83,7 @@ public class ChatController implements Initializable, MessageProcessor {
     public Label labelNickOnLReg;
     public Button buttonRegOnReg;
     public Cursor cursor;
+    public VBox componentContactList;
 
     @FXML
     private Button add;
@@ -460,9 +475,40 @@ public class ChatController implements Initializable, MessageProcessor {
         }
     }
 
-    public void OnDragDetected(MouseEvent mouseEvent) {
+    public void OnDragDetected(MouseEvent mouseEvent) throws IOException {
         movingContacts = contactPanel.getSelectionModel().getSelectedItems();
         contactPanel.setCursor(CLOSED_HAND);
+        Rectangle2D rectangle2D = new javafx.geometry.Rectangle2D(0, contactPanel.getSelectionModel()., contactPanel.getWidth(), cellSize);
+        SnapshotParameters param = new SnapshotParameters();
+        param.setViewport(rectangle2D);
+        WritableImage image = contactPanel.snapshot(param, null);
+
+
+
+        File file = new File("C:/MyImages/b1.png");
+        BufferedImage bi = convert(image);
+        ImageIO.write(bi, "png", file);
+
+    }
+
+    public BufferedImage convert(Image fxImage) {
+        int width = (int) Math.ceil(fxImage.getWidth());
+        int height = (int) Math.ceil(fxImage.getHeight());
+
+        BufferedImage image = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
+
+        int[] buffer = new int[width];
+
+        PixelReader reader = fxImage.getPixelReader();
+        WritablePixelFormat<IntBuffer> format =
+                PixelFormat.getIntArgbInstance();
+        for (int y = 0; y < height; y++) {
+            reader.getPixels(0, y, width, 1, format, buffer, 0, width);
+            image.getRaster().setDataElements(0, y, width, 1, buffer);
+        }
+
+        return image;
     }
 
     public void OnMouseDragger(MouseEvent mouseEvent) {
