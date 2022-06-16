@@ -42,6 +42,7 @@ import java.nio.IntBuffer;
 import java.util.*;
 import java.util.List;
 
+import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import static javafx.scene.Cursor.*;
 import static ru.gb.Chatterbox.client.Application.primaryStage;
 import static ru.gb.Chatterbox.client.lang.lang.ENGLISH;
@@ -478,16 +479,44 @@ public class ChatController implements Initializable, MessageProcessor {
     public void OnDragDetected(MouseEvent mouseEvent) throws IOException {
         movingContacts = contactPanel.getSelectionModel().getSelectedItems();
         contactPanel.setCursor(CLOSED_HAND);
-        Rectangle2D rectangle2D = new javafx.geometry.Rectangle2D(0, contactPanel.getSelectionModel()., contactPanel.getWidth(), cellSize);
+
+        Rectangle2D rectangle2D;
         SnapshotParameters param = new SnapshotParameters();
-        param.setViewport(rectangle2D);
-        WritableImage image = contactPanel.snapshot(param, null);
+        ObservableList <Integer> contactsCopyNumber = contactPanel.getSelectionModel().getSelectedIndices();
+        BufferedImage bufferedImage = new BufferedImage((int) contactPanel.getWidth() - 2, (int) cellSize * contactsCopyNumber.size(), BufferedImage.SCALE_DEFAULT);
+
+        for (int i = 0; i < contactsCopyNumber.size(); i++) {
+            rectangle2D = new Rectangle2D(1, contactsCopyNumber.get(i) * cellSize, contactPanel.getWidth() - 2, cellSize);
+            param.setViewport(rectangle2D);
+            WritableImage image = contactPanel.snapshot(param, null);
+            BufferedImage bi = convert(image);
+            bufferedImage.getGraphics().drawImage(bi, 0, i * (int) cellSize, null);
+        }
+
+        Dragboard db = primaryStage.getScene().startDragAndDrop(TransferMode.MOVE);
+
+        WritableImage image = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
+        PixelWriter pw = image.getPixelWriter();
+        for (int x = 0; x < bufferedImage.getWidth(); x++) {
+            for (int y = 0; y < bufferedImage.getHeight(); y++) {
+                pw.setArgb(x, y, bufferedImage.getRGB(x, y));
+            }
+        }
 
 
+
+        db.setDragView(image);
+
+//        ClipboardContent cc = new ClipboardContent();
+//        cc.putString("hfhfhfh");
+//        db.setContent(cc);
+
+//        setDragView(bufferedImage);
 
         File file = new File("C:/MyImages/b1.png");
         BufferedImage bi = convert(image);
         ImageIO.write(bi, "png", file);
+//        ImageIO.write(bufferedImage, "png", file);
 
     }
 

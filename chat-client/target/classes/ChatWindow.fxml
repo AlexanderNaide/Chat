@@ -197,12 +197,14 @@
                     <Insets left="6.0" right="6.0" top="6.0" />
                 </HBox.margin>
             </TextArea>
-            <VBox prefWidth="150.0">
+            <VBox fx:id="componentContactList" prefWidth="150.0">
                 <HBox.margin>
                     <Insets right="6.0" top="6.0" />
                 </HBox.margin>
 
-                <TreeView fx:id="contactPanel" onMouseDragged="#OnMouseDragger" onMouseReleased="#OnMouseReleased" prefHeight="400.0" prefWidth="200.0" />
+                <TreeView fx:id="contactPanel" onDragDetected="#OnDragDetected" onMouseDragged="#OnMouseDragger" onMouseReleased="#OnMouseReleased" prefHeight="400.0" prefWidth="200.0">
+
+               </TreeView>
 
 <!--                <ListView fx:id="contacts" prefHeight="400.0" prefWidth="200.0">
 
