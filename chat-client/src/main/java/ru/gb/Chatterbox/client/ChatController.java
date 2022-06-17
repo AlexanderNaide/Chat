@@ -19,6 +19,7 @@ import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import ru.gb.Chatterbox.client.lang.Language;
@@ -27,22 +28,15 @@ import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-//import java.awt.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.IntBuffer;
 import java.util.*;
 import java.util.List;
 
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import static javafx.scene.Cursor.*;
 import static ru.gb.Chatterbox.client.Application.primaryStage;
 import static ru.gb.Chatterbox.client.lang.lang.ENGLISH;
@@ -85,6 +79,7 @@ public class ChatController implements Initializable, MessageProcessor {
     public Button buttonRegOnReg;
     public Cursor cursor;
     public VBox componentContactList;
+    public ImageView dragContact;
 
     @FXML
     private Button add;
@@ -470,9 +465,10 @@ public class ChatController implements Initializable, MessageProcessor {
                     donorG.remove(user);
                 }
             }
-        movingContacts = null;
-        setItems();
-        contactPanel.setCursor(DEFAULT);
+            setItems();
+            movingContacts = null;
+            dragContact.setVisible(false);
+            contactPanel.setCursor(DEFAULT);
         }
     }
 
@@ -493,54 +489,52 @@ public class ChatController implements Initializable, MessageProcessor {
             bufferedImage.getGraphics().drawImage(bi, 0, i * (int) cellSize, null);
         }
 
-        Dragboard db = primaryStage.getScene().startDragAndDrop(TransferMode.MOVE);
 
         WritableImage image = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
         PixelWriter pw = image.getPixelWriter();
+        PixelReader pr = image.getPixelReader();
         for (int x = 0; x < bufferedImage.getWidth(); x++) {
             for (int y = 0; y < bufferedImage.getHeight(); y++) {
                 pw.setArgb(x, y, bufferedImage.getRGB(x, y));
+                Color color = pr.getColor(x, y);
+                Color newColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 0.5);
+                pw.setColor(x, y, newColor.brighter());
             }
         }
 
-
-
-        db.setDragView(image);
-
-//        ClipboardContent cc = new ClipboardContent();
-//        cc.putString("hfhfhfh");
-//        db.setContent(cc);
-
-//        setDragView(bufferedImage);
-
-        File file = new File("C:/MyImages/b1.png");
-        BufferedImage bi = convert(image);
-        ImageIO.write(bi, "png", file);
-//        ImageIO.write(bufferedImage, "png", file);
+        dragContact.setFitHeight(image.getHeight());
+        dragContact.setFitWidth(image.getWidth());
+        dragContact.setImage(image);
+        dragContact.setX(mouseEvent.getSceneX() - mouseEvent.getX());
+        dragContact.setY(mouseEvent.getSceneY());
+        dragContact.setVisible(true);
 
     }
 
-    public BufferedImage convert(Image fxImage) {
-        int width = (int) Math.ceil(fxImage.getWidth());
-        int height = (int) Math.ceil(fxImage.getHeight());
+    public BufferedImage convert(Image image) {
+        int width = (int) Math.ceil(image.getWidth());
+        int height = (int) Math.ceil(image.getHeight());
 
-        BufferedImage image = new BufferedImage(width, height,
+        BufferedImage bufferedImage = new BufferedImage(width, height,
                 BufferedImage.TYPE_INT_ARGB);
 
         int[] buffer = new int[width];
 
-        PixelReader reader = fxImage.getPixelReader();
+        PixelReader reader = image.getPixelReader();
         WritablePixelFormat<IntBuffer> format =
                 PixelFormat.getIntArgbInstance();
         for (int y = 0; y < height; y++) {
             reader.getPixels(0, y, width, 1, format, buffer, 0, width);
-            image.getRaster().setDataElements(0, y, width, 1, buffer);
+            bufferedImage.getRaster().setDataElements(0, y, width, 1, buffer);
         }
 
-        return image;
+        return bufferedImage;
     }
 
     public void OnMouseDragger(MouseEvent mouseEvent) {
+
+        dragContact.setX(mouseEvent.getSceneX() - mouseEvent.getX());
+        dragContact.setY(mouseEvent.getSceneY());
 
         double n = mouseEvent.getY();
         if (n >= contactPanel.getExpandedItemCount() * cellSize){

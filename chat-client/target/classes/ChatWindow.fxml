@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <AnchorPane fx:id="anchorPane" maxHeight="539.0" maxWidth="646.0" minHeight="235.0" minWidth="300.0" prefHeight="235.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.gb.Chatterbox.client.ChatController">
@@ -249,5 +250,6 @@
             </VBox.margin>
         </HBox>
     </VBox>
+   <ImageView fx:id="dragContact" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false" />
 
 </AnchorPane>
