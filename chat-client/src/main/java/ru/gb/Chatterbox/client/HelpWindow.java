@@ -2,11 +2,14 @@ package ru.gb.Chatterbox.client;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.*;
 
 import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static ru.gb.Chatterbox.client.Application.primaryStage;
 
 public class HelpWindow implements Initializable {
 

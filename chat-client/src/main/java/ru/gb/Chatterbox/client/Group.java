@@ -1,6 +1,5 @@
 package ru.gb.Chatterbox.client;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +41,10 @@ public class Group{
 
     public void add(User name){
         users.put(name.getNick(), name);
+    }
+
+    public void remove(User name){
+        users.remove(name.getNick(), name);
     }
 
     public void addAll(List<String> name){

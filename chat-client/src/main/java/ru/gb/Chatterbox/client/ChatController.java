@@ -1,26 +1,46 @@
 package ru.gb.Chatterbox.client;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.*;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import ru.gb.Chatterbox.client.lang.Language;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.IntBuffer;
 import java.util.*;
+import java.util.List;
 
+import static javafx.scene.Cursor.*;
 import static ru.gb.Chatterbox.client.Application.primaryStage;
+import static ru.gb.Chatterbox.client.lang.lang.ENGLISH;
+import static ru.gb.Chatterbox.client.lang.lang.RUSSIAN;
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 
@@ -40,6 +60,26 @@ public class ChatController implements Initializable, MessageProcessor {
 
     @FXML
     public TextField newPasswordField;
+    public CheckMenuItem englishSel;
+    public CheckMenuItem russianSel;
+    public ToggleGroup langAutGroup;
+    public ToggleGroup langRegGroup;
+    public ToggleButton setAEnglish;
+    public ToggleButton setARussian;
+    public ToggleButton setREnglish;
+    public ToggleButton setRRussian;
+    public Label labelRegOnLogin;
+    public Label labelLoginOnLogin;
+    public Label labelPasswordOnLogin;
+    public Button buttonConnectOnLogin;
+    public Label labelAuthOnReg;
+    public Label labelLoginOnReg;
+    public Label labelPasswordOnLReg;
+    public Label labelNickOnLReg;
+    public Button buttonRegOnReg;
+    public Cursor cursor;
+    public VBox componentContactList;
+    public ImageView dragContact;
 
     @FXML
     private Button add;
@@ -87,7 +127,7 @@ public class ChatController implements Initializable, MessageProcessor {
     private TextField inputField;
 
     @FXML
-    private Button btnSend;
+    public Button btnSend;
 
     private NetworkService networkService;
 
@@ -96,6 +136,12 @@ public class ChatController implements Initializable, MessageProcessor {
     private static Map <String, Group> groups;
 
     TreeItem <String> root;
+
+    private Language language;
+
+    private double cellSize;
+
+    private ObservableList<TreeItem<String>> movingContacts;
 
     public void mockAction(ActionEvent actionEvent) {
         System.out.println("mock");
@@ -134,11 +180,11 @@ public class ChatController implements Initializable, MessageProcessor {
                     forMessage.deleteCharAt(forMessage.length() - 1);
                 }
             }
-            text = "[Message for" + forMessage + ":] " + text;
+            text = language.text("[Message for") + forMessage + ":] " + text;
             chatArea.appendText(text + System.lineSeparator());
             inputField.clear();
         }catch (IOException e){
-            showError("Network error.");
+            showError(language.text("Network error."));
         }
     }
 
@@ -154,9 +200,10 @@ public class ChatController implements Initializable, MessageProcessor {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         networkService = new NetworkService(this);
-
+        language = new Language(this);
+        cellSize = 25.0;
         groups = new HashMap<>();
-        Group allUsers = new Group("Все");
+        Group allUsers = new Group("ALL");
         groups.put(allUsers.getTitle(), allUsers);
 
         // необязательные группы
@@ -182,14 +229,18 @@ public class ChatController implements Initializable, MessageProcessor {
     }
 
     private void setItems() {
+        if (contactPanel.getRoot() != null){
+        runContact();
+        }
+
         root = new TreeItem<>();
         for (Group g : groups.values()) {
             TreeItem <String> item = new TreeItem<>();
-            if (g.getTitle().equals("Все")  && groups.get("Все").getUsers().isEmpty()){
+            if (g.getTitle().equals("ALL")  && groups.get("ALL").getUsers().isEmpty()){
                 item.setValue("grOff " + g.getTitle());
             } else {
                 for (String nick : g.getUsers().keySet()) {
-                    if (groups.get("Все").getUsers().containsKey(nick) && !groups.get("Все").getUsers().isEmpty()) {
+                    if (groups.get("ALL").getUsers().containsKey(nick) && !groups.get("ALL").getUsers().isEmpty()) {
                         item.setValue("grOn " + g.getTitle());
                         break;
                     } else {
@@ -198,18 +249,18 @@ public class ChatController implements Initializable, MessageProcessor {
                 }
             }
             root.getChildren().add(item);
+            item.setExpanded(g.getUnfold());
             for (String s : g.getUsers().keySet()) {
                 TreeItem <String> childrenItem;
-                if (groups.get("Все").getUsers().containsKey(s)){
+                if (groups.get("ALL").getUsers().containsKey(s)){
                     childrenItem = new TreeItem<>("usOn " + s);
                 } else {
                     childrenItem = new TreeItem<>("usOff " + s);
                 }
                 item.getChildren().add(childrenItem);
             }
-            root.setExpanded(g.getUnfold());
         }
-        root.setExpanded(true);
+        contactPanel.setFixedCellSize(cellSize);
         contactPanel.setShowRoot(false);
         contactPanel.setRoot(root);
         contactPanel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -224,25 +275,32 @@ public class ChatController implements Initializable, MessageProcessor {
                     String[] row = item.split(" ");
                     switch (row[0]){
                         case "grOn" -> {
-                            setText(row[1]);
+                            setText(language.text(row[1]));
                             setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
                         }
                         case "usOn" -> {
-                            setText(row[1]);
+                            setText(language.text(row[1]));
                             setStyle(" -fx-font-style: italic;");
                         }
                         case "usOff" -> {
-                            setText(row[1]);
+                            setText(language.text(row[1]));
                             setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
                         }
                         default -> {
-                            setText(row[1]);
+                            setText(language.text(row[1]));
                             setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
                         }
                     }
                 }
             }
         });
+    }
+
+    public void runContact(){
+        for (TreeItem<String> a : contactPanel.getRoot().getChildren()) {
+            Group g = groups.get(a.getValue().substring(a.getValue().indexOf(" ") + 1));
+            g.setUnfold(a.expandedProperty().getValue());
+        }
     }
 
     private void downloadUsers(File usersArchive, Group allUsers) {
@@ -283,8 +341,8 @@ public class ChatController implements Initializable, MessageProcessor {
         List<String> contact = new ArrayList<>(Arrays.asList(split));
         contact.remove(0);
         contact.remove(user);
-        contact.removeIf(s -> groups.get("Все").getUsers().containsKey(s));
-        groups.get("Все").addAll(contact);
+        contact.removeIf(s -> groups.get("ALL").getUsers().containsKey(s));
+        groups.get("ALL").addAll(contact);
         setItems();
     }
 
@@ -311,13 +369,13 @@ public class ChatController implements Initializable, MessageProcessor {
 
     public void sendAuthorisationWindow(MouseEvent mouseEvent) {
         registrationPanel.setVisible(false);
-        primaryStage.setTitle("Authorization");
+        primaryStage.setTitle("Chatterbox");
         loginPanel.setVisible(true);
     }
 
     public void sendRegistrationWindow(MouseEvent mouseEvent) {
         loginPanel.setVisible(false);
-        primaryStage.setTitle("Registration");
+        primaryStage.setTitle("Chatterbox");
         registrationPanel.setVisible(true);
     }
 
@@ -359,4 +417,187 @@ public class ChatController implements Initializable, MessageProcessor {
             showError("Network error.");
         }
     }
+
+    public void selectEnglish(ActionEvent actionEvent) {
+        langAutGroup.selectToggle(setAEnglish);
+        langRegGroup.selectToggle(setREnglish);
+        language.redrawing(ENGLISH.getLanguage());
+        englishSel.setSelected(true);
+        russianSel.setSelected(false);
+    }
+
+    public void selectRussian(ActionEvent actionEvent) {
+        langAutGroup.selectToggle(setARussian);
+        langRegGroup.selectToggle(setRRussian);
+        language.redrawing(RUSSIAN.getLanguage());
+        russianSel.setSelected(true);
+        englishSel.setSelected(false);
+    }
+
+    //*************   Изучаемые события   ***************
+
+    public void OnMouseReleased(MouseEvent mouseEvent) {
+        if (movingContacts != null){
+            double n = mouseEvent.getY();
+            if (n > contactPanel.getExpandedItemCount() * cellSize){
+                n = (contactPanel.getExpandedItemCount() * cellSize) - 1.0;
+            }
+            int nom = (int) (n/cellSize);
+            String parent;
+            if (contactPanel.getTreeItem(nom).getParent().getValue() == null){
+                parent = contactPanel.getTreeItem(nom).getValue();
+            } else {
+                parent = contactPanel.getTreeItem(nom).getParent().getValue();
+            }
+            parent = parent.substring(parent.indexOf(" ") + 1);
+            for (TreeItem<String> item : movingContacts){
+                if (item.getParent().getValue() == null){
+                    break;
+                }
+                Group donorG = groups.get(item.getParent().getValue().substring(item.getParent().getValue().indexOf(" ") + 1));
+                if (donorG.getTitle().equals(parent)){
+                    break;
+                }
+                User user = groups.get(donorG.getTitle()).getUsers().get(item.getValue().substring(item.getValue().indexOf(" ") + 1));
+
+                groups.get(parent).add(user);
+                if (!donorG.getTitle().equals("ALL")){
+                    donorG.remove(user);
+                }
+            }
+            setItems();
+            movingContacts = null;
+            dragContact.setVisible(false);
+            contactPanel.setCursor(DEFAULT);
+        }
+    }
+
+    public void OnDragDetected(MouseEvent mouseEvent) throws IOException {
+        movingContacts = contactPanel.getSelectionModel().getSelectedItems();
+        contactPanel.setCursor(CLOSED_HAND);
+
+        Rectangle2D rectangle2D;
+        SnapshotParameters param = new SnapshotParameters();
+        ObservableList <Integer> contactsCopyNumber = contactPanel.getSelectionModel().getSelectedIndices();
+        BufferedImage bufferedImage = new BufferedImage((int) contactPanel.getWidth() - 2, (int) cellSize * contactsCopyNumber.size(), BufferedImage.SCALE_DEFAULT);
+
+        for (int i = 0; i < contactsCopyNumber.size(); i++) {
+            rectangle2D = new Rectangle2D(1, contactsCopyNumber.get(i) * cellSize, contactPanel.getWidth() - 2, cellSize);
+            param.setViewport(rectangle2D);
+            WritableImage image = contactPanel.snapshot(param, null);
+            BufferedImage bi = convert(image);
+            bufferedImage.getGraphics().drawImage(bi, 0, i * (int) cellSize, null);
+        }
+
+
+        WritableImage image = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
+        PixelWriter pw = image.getPixelWriter();
+        PixelReader pr = image.getPixelReader();
+        for (int x = 0; x < bufferedImage.getWidth(); x++) {
+            for (int y = 0; y < bufferedImage.getHeight(); y++) {
+                pw.setArgb(x, y, bufferedImage.getRGB(x, y));
+                Color color = pr.getColor(x, y);
+                Color newColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 0.5);
+                pw.setColor(x, y, newColor.brighter());
+            }
+        }
+
+        dragContact.setFitHeight(image.getHeight());
+        dragContact.setFitWidth(image.getWidth());
+        dragContact.setImage(image);
+        dragContact.setX(mouseEvent.getSceneX() - mouseEvent.getX());
+        dragContact.setY(mouseEvent.getSceneY());
+        dragContact.setVisible(true);
+
+    }
+
+    public BufferedImage convert(Image image) {
+        int width = (int) Math.ceil(image.getWidth());
+        int height = (int) Math.ceil(image.getHeight());
+
+        BufferedImage bufferedImage = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
+
+        int[] buffer = new int[width];
+
+        PixelReader reader = image.getPixelReader();
+        WritablePixelFormat<IntBuffer> format =
+                PixelFormat.getIntArgbInstance();
+        for (int y = 0; y < height; y++) {
+            reader.getPixels(0, y, width, 1, format, buffer, 0, width);
+            bufferedImage.getRaster().setDataElements(0, y, width, 1, buffer);
+        }
+
+        return bufferedImage;
+    }
+
+    public void OnMouseDragger(MouseEvent mouseEvent) {
+
+        dragContact.setX(mouseEvent.getSceneX() - mouseEvent.getX());
+        dragContact.setY(mouseEvent.getSceneY());
+
+        double n = mouseEvent.getY();
+        if (n >= contactPanel.getExpandedItemCount() * cellSize){
+            n = (contactPanel.getExpandedItemCount() * cellSize) - 1.0;
+        }
+        int nom = (int) (n/cellSize);
+        int nomF = 0;
+
+        for (int i = nom; i > 0; i--) {
+            if (contactPanel.getTreeItem(i).getParent().getValue() == null){
+                nomF = i;
+                break;
+            }
+        }
+        final int[] count = new int[1];
+
+        int finalNomF = nomF;
+        contactPanel.setCellFactory(tv -> new TreeCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText("");
+                } else {
+                    String[] row = item.split(" ");
+                    switch (row[0]){
+                        case "grOn" -> {
+                            setText(language.text(row[1]));
+                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
+                            if (finalNomF == count[0]){
+                                setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic;");
+                            }
+                        }
+                        case "usOn" -> {
+                            setText(language.text(row[1]));
+                            setStyle(" -fx-font-style: italic;");
+                        }
+                        case "usOff" -> {
+                            setText(language.text(row[1]));
+                            setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
+                        }
+                        default -> {
+                            setText(language.text(row[1]));
+                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+                            if (finalNomF == count[0]){
+                                setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+                            }
+                        }
+                    }
+                    count[0]++;
+                }
+            }
+        });
+
+    }
+
+    public void OnActionDel(ActionEvent actionEvent) {
+    }
+
+    public void OnDragDetectedbuttonDel(MouseEvent mouseEvent) {
+    }
+
+    public void OnMousePressedDel(MouseEvent mouseEvent) {
+    }
+
 }
