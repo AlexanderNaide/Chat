@@ -80,6 +80,7 @@ public class ChatController implements Initializable, MessageProcessor {
     public Cursor cursor;
     public VBox componentContactList;
     public ImageView dragContact;
+    public TextField editing;
 
     @FXML
     private Button add;
@@ -143,6 +144,8 @@ public class ChatController implements Initializable, MessageProcessor {
 
     private ObservableList<TreeItem<String>> movingContacts;
 
+    private Group allUsers;
+
     public void mockAction(ActionEvent actionEvent) {
         System.out.println("mock");
     }
@@ -203,20 +206,31 @@ public class ChatController implements Initializable, MessageProcessor {
         language = new Language(this);
         cellSize = 25.0;
         groups = new HashMap<>();
-        Group allUsers = new Group("ALL");
+        allUsers = new Group("ALL");
         groups.put(allUsers.getTitle(), allUsers);
+        editing.setMinSize(contactPanel.getMinWidth(), cellSize);
+        editing.setMaxSize(contactPanel.getMaxWidth(), cellSize);
 
         // необязательные группы
+        allUsers.add(new User("Толик"));
+        allUsers.add(new User("Ваня"));
+        allUsers.add(new User("Рома"));
+        allUsers.add(new User("Ира"));
+        allUsers.add(new User("Дашка"));
+        allUsers.add(new User("Женька-печенька"));
+        allUsers.add(new User("Танюха"));
+
         Group myOffice = new Group("Мой отдел");
-        myOffice.add(new User("Толик"));
-        myOffice.add(new User("Ваня"));
-        myOffice.add(new User("Рома"));
-        myOffice.add(new User("Ира"));
+        myOffice.add(allUsers.getUsers().get("Толик"));
+        myOffice.add(allUsers.getUsers().get("Ваня"));
+        myOffice.add(allUsers.getUsers().get("Рома"));
+        myOffice.add(allUsers.getUsers().get("Ира"));
         groups.put(myOffice.getTitle(), myOffice);
+
         Group btcOffice = new Group("БТКашки");
-        btcOffice.add(new User("Дашка"));
-        btcOffice.add(new User("Женька-печенька"));
-        btcOffice.add(new User("Танюха"));
+        btcOffice.add(allUsers.getUsers().get("Дашка"));
+        btcOffice.add(allUsers.getUsers().get("Женька-печенька"));
+        btcOffice.add(allUsers.getUsers().get("Танюха"));
         groups.put(btcOffice.getTitle(), btcOffice);
 
         File usersArchive = new File(String.valueOf(getClass().getResource("users.txt")));
@@ -252,10 +266,10 @@ public class ChatController implements Initializable, MessageProcessor {
             item.setExpanded(g.getUnfold());
             for (String s : g.getUsers().keySet()) {
                 TreeItem <String> childrenItem;
-                if (groups.get("ALL").getUsers().containsKey(s)){
-                    childrenItem = new TreeItem<>("usOn " + s);
+                if (allUsers.getUsers().containsKey(s)){
+                    childrenItem = new TreeItem<>("usOn " + g.getUsers().get(s).getName(s));
                 } else {
-                    childrenItem = new TreeItem<>("usOff " + s);
+                    childrenItem = new TreeItem<>("usOff " + g.getUsers().get(s).getName(s));
                 }
                 item.getChildren().add(childrenItem);
             }
@@ -275,19 +289,19 @@ public class ChatController implements Initializable, MessageProcessor {
                     String[] row = item.split(" ");
                     switch (row[0]){
                         case "grOn" -> {
-                            setText(language.text(row[1]));
+                            setText(language.text(getStringItem(item)));
                             setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
                         }
                         case "usOn" -> {
-                            setText(language.text(row[1]));
+                            setText(language.text(getStringItem(item)));
                             setStyle(" -fx-font-style: italic;");
                         }
                         case "usOff" -> {
-                            setText(language.text(row[1]));
+                            setText(language.text(getStringItem(item)));
                             setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
                         }
                         default -> {
-                            setText(language.text(row[1]));
+                            setText(language.text(getStringItem(item)));
                             setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
                         }
                     }
@@ -449,7 +463,7 @@ public class ChatController implements Initializable, MessageProcessor {
             } else {
                 parent = contactPanel.getTreeItem(nom).getParent().getValue();
             }
-            parent = parent.substring(parent.indexOf(" ") + 1);
+            parent = getStringItem(parent);
             for (TreeItem<String> item : movingContacts){
                 if (item.getParent().getValue() == null){
                     break;
@@ -458,6 +472,11 @@ public class ChatController implements Initializable, MessageProcessor {
                 if (donorG.getTitle().equals(parent)){
                     break;
                 }
+//                User user = groups.get(donorG.getTitle()).getUsers().get(item.getValue().substring(item.getValue().indexOf(" ") + 1));
+//                User user;
+//                for (User u : groups.get(donorG.getTitle()).getUsers()) {
+//
+//                }
                 User user = groups.get(donorG.getTitle()).getUsers().get(item.getValue().substring(item.getValue().indexOf(" ") + 1));
 
                 groups.get(parent).add(user);
@@ -562,22 +581,22 @@ public class ChatController implements Initializable, MessageProcessor {
                     String[] row = item.split(" ");
                     switch (row[0]){
                         case "grOn" -> {
-                            setText(language.text(row[1]));
+                            setText(language.text(getStringItem(item)));
                             setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
                             if (finalNomF == count[0]){
                                 setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic;");
                             }
                         }
                         case "usOn" -> {
-                            setText(language.text(row[1]));
+                            setText(language.text(getStringItem(item)));
                             setStyle(" -fx-font-style: italic;");
                         }
                         case "usOff" -> {
-                            setText(language.text(row[1]));
+                            setText(language.text(getStringItem(item)));
                             setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
                         }
                         default -> {
-                            setText(language.text(row[1]));
+                            setText(language.text(getStringItem(item)));
                             setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
                             if (finalNomF == count[0]){
                                 setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
@@ -600,4 +619,46 @@ public class ChatController implements Initializable, MessageProcessor {
     public void OnMousePressedDel(MouseEvent mouseEvent) {
     }
 
+    public void onMouseClicked(MouseEvent mouseEvent) {
+        if(mouseEvent.getClickCount() == 2){
+            TreeItem<String> item = contactPanel.getFocusModel().getFocusedItem();
+            if (item.getParent().getValue() != null){
+                setNewNameContact(item, mouseEvent);
+            } else {
+                setNewNameGroup(item);
+            }
+        }
+    }
+
+    public void setNewNameContact(TreeItem<String> item, MouseEvent mouseEvent){
+        User user = allUsers.getUsers().get(getStringItem(item.getValue()));
+
+        editing.setLayoutX(mouseEvent.getSceneX() - mouseEvent.getX());
+        editing.setLayoutY(mouseEvent.getSceneY() - (mouseEvent.getY() % cellSize) + contactPanel.getScaleX());
+        editing.setText(getStringItem(item.getValue()));
+        editing.setVisible(true);
+        editing.setOnAction(e -> {
+            user.setName(editing.getText());
+            editing.setVisible(false);
+            setItems();
+        });
+
+
+
+
+//        System.out.println(user.getNick());
+
+//        System.out.println("cont  " + item.getValue());
+    }
+
+    public void setNewNameGroup(TreeItem<String> item){
+//        System.out.println("group  " + item.getValue());
+//        System.out.println(item.getChildren().toString());
+//        System.out.println(item.getParent().getValue());
+
+    }
+
+    public String getStringItem (String item){
+        return item.substring(item.indexOf(" ") + 1);
+    }
 }
