@@ -37,7 +37,7 @@ public class User {
         this.name = name;
     }
 
-    public String getName(String nick) {
+    public String getName() {
         if(name != null) {
             return name;
         } else {

@@ -46,19 +46,10 @@ import static ru.gb.Chatterbox.enums.Command.*;
 
 public class ChatController implements Initializable, MessageProcessor {
 
-    @FXML
     public TreeView <String> contactPanel;
-
-    @FXML
     public AnchorPane anchorPane;
-
-    @FXML
     public VBox registrationPanel;
-
-    @FXML
     public TextField newLoginField;
-
-    @FXML
     public TextField newPasswordField;
     public CheckMenuItem englishSel;
     public CheckMenuItem russianSel;
@@ -81,69 +72,39 @@ public class ChatController implements Initializable, MessageProcessor {
     public VBox componentContactList;
     public ImageView dragContact;
     public TextField editing;
-
     @FXML
     private Button add;
-
     @FXML
     private Button addGroup;
-
     @FXML
     private Button del;
-
-    @FXML
     private VBox changeNickPanel;
-
-    @FXML
     private VBox changePasswordPanel;
-
     @FXML
     private TextField newNickField;
-
-    @FXML
     private TextField newPassField;
-
-    @FXML
     private TextField oldPassField;
-
     @FXML
     private VBox loginPanel;
-
     @FXML
     private TextField PasswordField;
-
     @FXML
     private TextField LoginField;
-
     @FXML
     private VBox mainPanel;
-
     @FXML
     private TextArea chatArea;
-
-    @FXML
     private ListView<String> contacts;
-
     @FXML
     private TextField inputField;
-
-    @FXML
     public Button btnSend;
-
     private NetworkService networkService;
-
     private String user;
-
     private static Map <String, Group> groups;
-
-    TreeItem <String> root;
-
+    private TreeItem <String> root;
     private Language language;
-
     private double cellSize;
-
     private ObservableList<TreeItem<String>> movingContacts;
-
     private Group allUsers;
 
     public void mockAction(ActionEvent actionEvent) {
@@ -168,22 +129,29 @@ public class ChatController implements Initializable, MessageProcessor {
                 forMessage.append(" ").append("ALL");
             } else {
                 for (TreeItem<String> item : selectionModel.getSelectedItems()) {
-                    String[] split = item.getValue().split(" ");
-                    String recipient = split[1];
+//                    String[] split = item.getValue().split(" ");
+//                    String recipient = split[1];
+//                    String recipient = getStringItem(item.getValue());
+                    String recipient = getStringItem(item.getValue());
+                    System.out.println(recipient);
                     forMessage.append(" ").append(recipient).append(",");
-                    if (groups.containsKey(recipient)) {
-                        for (String s : groups.get(recipient).getUsers().keySet()) {
+                    if (item.getParent().getValue() == null) {
+                        for (String s : groups.get(getStringItem(item.getValue())).getUsers().keySet()) {
                             networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + s + REGEX + text);
                         }
                     } else {
-                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
+//                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
+                        System.out.println(item.getParent().getValue());
+//                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + getUser(groups.get(item.getParent().getValue()), recipient).getNick() + REGEX + text);
+                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + getUser(groups.get(getStringItem(item.getParent().getValue())), recipient).getNick() + REGEX + text);
                     }
                 }
                 if (!forMessage.isEmpty()) {
                     forMessage.deleteCharAt(forMessage.length() - 1);
                 }
             }
-            text = language.text("[Message for") + forMessage + ":] " + text;
+//            text = language.text("[Message for") + forMessage + ":] " + text;
+            text = language.text("Message for") + forMessage + ":\n    " + text;
             chatArea.appendText(text + System.lineSeparator());
             inputField.clear();
         }catch (IOException e){
@@ -207,6 +175,7 @@ public class ChatController implements Initializable, MessageProcessor {
         cellSize = 25.0;
         groups = new HashMap<>();
         allUsers = new Group("ALL");
+        allUsers.setUnfold(false);
         groups.put(allUsers.getTitle(), allUsers);
         editing.setMinSize(contactPanel.getMinWidth(), cellSize);
         editing.setMaxSize(contactPanel.getMaxWidth(), cellSize);
@@ -250,26 +219,37 @@ public class ChatController implements Initializable, MessageProcessor {
         root = new TreeItem<>();
         for (Group g : groups.values()) {
             TreeItem <String> item = new TreeItem<>();
-            if (g.getTitle().equals("ALL")  && groups.get("ALL").getUsers().isEmpty()){
-                item.setValue("grOff " + g.getTitle());
-            } else {
-                for (String nick : g.getUsers().keySet()) {
-                    if (groups.get("ALL").getUsers().containsKey(nick) && !groups.get("ALL").getUsers().isEmpty()) {
-                        item.setValue("grOn " + g.getTitle());
-                        break;
-                    } else {
-                        item.setValue("grOff " + g.getTitle());
-                    }
+
+            for (User user : g.getUsers().values()) {
+                if (user.getIsOnline()) {
+                    item.setValue("grOn " + g.getTitle());
+                    break;
+                } else {
+                    item.setValue("grOff " + g.getTitle());
                 }
             }
+
+//            if (g.getTitle().equals("ALL")  && groups.get("ALL").getUsers().isEmpty()){
+//                item.setValue("grOff " + g.getTitle());
+//            } else {
+//                for (String nick : g.getUsers().keySet()) {
+//                    if (groups.get("ALL").getUsers().containsKey(nick) && !groups.get("ALL").getUsers().isEmpty()) {
+//                        item.setValue("grOn " + g.getTitle());
+//                        break;
+//                    } else {
+//                        item.setValue("grOff " + g.getTitle());
+//                    }
+//                }
+//            }
             root.getChildren().add(item);
             item.setExpanded(g.getUnfold());
             for (String s : g.getUsers().keySet()) {
                 TreeItem <String> childrenItem;
-                if (allUsers.getUsers().containsKey(s)){
-                    childrenItem = new TreeItem<>("usOn " + g.getUsers().get(s).getName(s));
+//                if (allUsers.getUsers().containsKey(s)){
+                if (g.getUsers().get(s).getIsOnline()){
+                    childrenItem = new TreeItem<>("usOn " + g.getUsers().get(s).getName());
                 } else {
-                    childrenItem = new TreeItem<>("usOff " + g.getUsers().get(s).getName(s));
+                    childrenItem = new TreeItem<>("usOff " + g.getUsers().get(s).getName());
                 }
                 item.getChildren().add(childrenItem);
             }
@@ -312,8 +292,21 @@ public class ChatController implements Initializable, MessageProcessor {
 
     public void runContact(){
         for (TreeItem<String> a : contactPanel.getRoot().getChildren()) {
-            Group g = groups.get(a.getValue().substring(a.getValue().indexOf(" ") + 1));
+            System.out.println(a.getValue());
+            Group g = groups.get(getStringItem(a.getValue()));
             g.setUnfold(a.expandedProperty().getValue());
+        }
+    }
+
+    public void runContact(String oldTitle, String newTitle){
+        for (TreeItem<String> a : contactPanel.getRoot().getChildren()) {
+            if (getStringItem(a.getValue()).equals(oldTitle)){
+                Group g = groups.get(newTitle);
+                g.setUnfold(a.expandedProperty().getValue());
+            } else {
+                Group g = groups.get(getStringItem(a.getValue()));
+                g.setUnfold(a.expandedProperty().getValue());
+            }
         }
     }
 
@@ -448,6 +441,15 @@ public class ChatController implements Initializable, MessageProcessor {
         englishSel.setSelected(false);
     }
 
+    public User getUser (Group group, String name){
+        for (User user : group.getUsers().values()) {
+            if (name.equals(user.getName())){
+                return user;
+            }
+        }
+        return null;
+    }
+
     //*************   Изучаемые события   ***************
 
     public void OnMouseReleased(MouseEvent mouseEvent) {
@@ -457,29 +459,33 @@ public class ChatController implements Initializable, MessageProcessor {
                 n = (contactPanel.getExpandedItemCount() * cellSize) - 1.0;
             }
             int nom = (int) (n/cellSize);
-            String parent;
+            Group recipientG;
+//            String parent;
             if (contactPanel.getTreeItem(nom).getParent().getValue() == null){
-                parent = contactPanel.getTreeItem(nom).getValue();
+                recipientG = groups.get(getStringItem(contactPanel.getTreeItem(nom).getValue()));
+//                parent = contactPanel.getTreeItem(nom).getValue();
             } else {
-                parent = contactPanel.getTreeItem(nom).getParent().getValue();
+                recipientG = groups.get(getStringItem(contactPanel.getTreeItem(nom).getParent().getValue()));
+//                parent = contactPanel.getTreeItem(nom).getParent().getValue();
             }
-            parent = getStringItem(parent);
+//            parent = getStringItem(parent);
             for (TreeItem<String> item : movingContacts){
                 if (item.getParent().getValue() == null){
                     break;
                 }
-                Group donorG = groups.get(item.getParent().getValue().substring(item.getParent().getValue().indexOf(" ") + 1));
-                if (donorG.getTitle().equals(parent)){
+//                Group donorG = groups.get(item.getParent().getValue().substring(item.getParent().getValue().indexOf(" ") + 1));
+                Group donorG = groups.get(getStringItem(item.getParent().getValue()));
+//                if (donorG.getTitle().equals(parent)){
+                if (donorG.equals(recipientG)){
                     break;
                 }
-//                User user = groups.get(donorG.getTitle()).getUsers().get(item.getValue().substring(item.getValue().indexOf(" ") + 1));
-//                User user;
-//                for (User u : groups.get(donorG.getTitle()).getUsers()) {
-//
-//                }
-                User user = groups.get(donorG.getTitle()).getUsers().get(item.getValue().substring(item.getValue().indexOf(" ") + 1));
 
-                groups.get(parent).add(user);
+//                User user = groups.get(donorG.getTitle()).getUsers().get(item.getValue().substring(item.getValue().indexOf(" ") + 1));
+//                User user = donorG.getUsers().get(getStringItem(item.getValue()));
+                User user = getUser(donorG, getStringItem(item.getValue()));
+
+//                groups.get(parent).add(user);
+                recipientG.add(user);
                 if (!donorG.getTitle().equals("ALL")){
                     donorG.remove(user);
                 }
@@ -625,37 +631,66 @@ public class ChatController implements Initializable, MessageProcessor {
             if (item.getParent().getValue() != null){
                 setNewNameContact(item, mouseEvent);
             } else {
-                setNewNameGroup(item);
+                setNewNameGroup(item, mouseEvent);
             }
         }
     }
 
-    public void setNewNameContact(TreeItem<String> item, MouseEvent mouseEvent){
-        User user = allUsers.getUsers().get(getStringItem(item.getValue()));
+    private User renameUser;
+    private Group renameGroup;
 
+    private void methodRenameUser(String newName){
+        renameUser.setName(newName);
+    }
+
+    private void methodRenameGroup(String newTitle){
+        String oldTitle = renameGroup.getTitle();
+        renameGroup.setTitle(newTitle);
+        groups.put(renameGroup.getTitle(), renameGroup);
+        groups.remove(oldTitle);
+        runContact(oldTitle, newTitle);
+    }
+
+    public void setNewNameContact(TreeItem<String> item, MouseEvent mouseEvent){
+        renameUser = getUser(groups.get(getStringItem(item.getParent().getValue())), getStringItem(item.getValue()));
         editing.setLayoutX(mouseEvent.getSceneX() - mouseEvent.getX());
         editing.setLayoutY(mouseEvent.getSceneY() - (mouseEvent.getY() % cellSize) + contactPanel.getScaleX());
-        editing.setText(getStringItem(item.getValue()));
+        editing.setText(renameUser.getName());
         editing.setVisible(true);
+        editing.requestFocus();
+        editing.focusedProperty().addListener(e -> {
+            if (!editing.isFocused()){
+                methodRenameUser(editing.getText());
+                editing.setVisible(false);
+                setItems();
+            }
+        });
         editing.setOnAction(e -> {
-            user.setName(editing.getText());
+            methodRenameUser(editing.getText());
             editing.setVisible(false);
             setItems();
         });
-
-
-
-
-//        System.out.println(user.getNick());
-
-//        System.out.println("cont  " + item.getValue());
     }
 
-    public void setNewNameGroup(TreeItem<String> item){
-//        System.out.println("group  " + item.getValue());
-//        System.out.println(item.getChildren().toString());
-//        System.out.println(item.getParent().getValue());
-
+    public void setNewNameGroup(TreeItem<String> item,  MouseEvent mouseEvent){
+        renameGroup = groups.get(getStringItem(item.getValue()));
+        editing.setLayoutX(mouseEvent.getSceneX() - mouseEvent.getX());
+        editing.setLayoutY(mouseEvent.getSceneY() - (mouseEvent.getY() % cellSize) + contactPanel.getScaleX());
+        editing.setText(renameGroup.getTitle());
+        editing.setVisible(true);
+        editing.requestFocus();
+        editing.focusedProperty().addListener(e -> {
+            if (!editing.isFocused()){
+                methodRenameGroup(editing.getText());
+                editing.setVisible(false);
+                setItems();
+            }
+        });
+        editing.setOnAction(e -> {
+            methodRenameGroup(editing.getText());
+            editing.setVisible(false);
+            setItems();
+        });
     }
 
     public String getStringItem (String item){
