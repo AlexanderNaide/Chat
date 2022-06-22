@@ -208,11 +208,11 @@ public class ChatController implements Initializable, MessageProcessor {
         if(usersArchive.length() != 0){
             downloadUsers(usersArchive, allUsers);
         }
-        setItems();
+        setItems(false);
     }
 
-    private void setItems() {
-        if (contactPanel.getRoot() != null){
+    private void setItems(boolean is) {
+        if (is){
         runContact();
         }
 
@@ -292,10 +292,14 @@ public class ChatController implements Initializable, MessageProcessor {
 
     public void runContact(){
         for (TreeItem<String> a : contactPanel.getRoot().getChildren()) {
-            System.out.println(a.getValue());
             Group g = groups.get(getStringItem(a.getValue()));
             g.setUnfold(a.expandedProperty().getValue());
         }
+    }
+
+    private void setItems(String oldTitle, String newTitle) {
+        runContact(oldTitle, newTitle);
+        setItems(false);
     }
 
     public void runContact(String oldTitle, String newTitle){
@@ -350,7 +354,7 @@ public class ChatController implements Initializable, MessageProcessor {
         contact.remove(user);
         contact.removeIf(s -> groups.get("ALL").getUsers().containsKey(s));
         groups.get("ALL").addAll(contact);
-        setItems();
+        setItems(true);
     }
 
     private void authOk(String[] split){
@@ -490,7 +494,7 @@ public class ChatController implements Initializable, MessageProcessor {
                     donorG.remove(user);
                 }
             }
-            setItems();
+            setItems(true);
             movingContacts = null;
             dragContact.setVisible(false);
             contactPanel.setCursor(DEFAULT);
@@ -641,6 +645,7 @@ public class ChatController implements Initializable, MessageProcessor {
 
     private void methodRenameUser(String newName){
         renameUser.setName(newName);
+        setItems(true);
     }
 
     private void methodRenameGroup(String newTitle){
@@ -648,7 +653,7 @@ public class ChatController implements Initializable, MessageProcessor {
         renameGroup.setTitle(newTitle);
         groups.put(renameGroup.getTitle(), renameGroup);
         groups.remove(oldTitle);
-        runContact(oldTitle, newTitle);
+        setItems(oldTitle, newTitle);
     }
 
     public void setNewNameContact(TreeItem<String> item, MouseEvent mouseEvent){
@@ -659,16 +664,14 @@ public class ChatController implements Initializable, MessageProcessor {
         editing.setVisible(true);
         editing.requestFocus();
         editing.focusedProperty().addListener(e -> {
-            if (!editing.isFocused()){
+            if (!editing.isFocused() && editing.isVisible()){
                 methodRenameUser(editing.getText());
                 editing.setVisible(false);
-                setItems();
             }
         });
         editing.setOnAction(e -> {
             methodRenameUser(editing.getText());
             editing.setVisible(false);
-            setItems();
         });
     }
 
@@ -680,16 +683,14 @@ public class ChatController implements Initializable, MessageProcessor {
         editing.setVisible(true);
         editing.requestFocus();
         editing.focusedProperty().addListener(e -> {
-            if (!editing.isFocused()){
+            if (!editing.isFocused() && editing.isVisible()){
                 methodRenameGroup(editing.getText());
                 editing.setVisible(false);
-                setItems();
             }
         });
         editing.setOnAction(e -> {
             methodRenameGroup(editing.getText());
-            editing.setVisible(false);
-            setItems();
+            editing.setVisible(false);;
         });
     }
 
