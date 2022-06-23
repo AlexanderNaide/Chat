@@ -1,6 +1,8 @@
 package ru.gb.Chatterbox.client;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -642,9 +644,11 @@ public class ChatController implements Initializable, MessageProcessor {
 
     private User renameUser;
     private Group renameGroup;
+    private InvalidationListener listener;
 
     private void methodRenameUser(String newName){
         renameUser.setName(newName);
+        editing.focusedProperty().removeListener(listener);
         setItems(true);
     }
 
@@ -653,6 +657,7 @@ public class ChatController implements Initializable, MessageProcessor {
         renameGroup.setTitle(newTitle);
         groups.put(renameGroup.getTitle(), renameGroup);
         groups.remove(oldTitle);
+        editing.focusedProperty().removeListener(listener);
         setItems(oldTitle, newTitle);
     }
 
@@ -663,12 +668,16 @@ public class ChatController implements Initializable, MessageProcessor {
         editing.setText(renameUser.getName());
         editing.setVisible(true);
         editing.requestFocus();
-        editing.focusedProperty().addListener(e -> {
-            if (!editing.isFocused() && editing.isVisible()){
-                methodRenameUser(editing.getText());
-                editing.setVisible(false);
+        listener = new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (!editing.isFocused() && editing.isVisible()){
+                    methodRenameUser(editing.getText());
+                    editing.setVisible(false);
+                }
             }
-        });
+        };
+        editing.focusedProperty().addListener(listener);
         editing.setOnAction(e -> {
             methodRenameUser(editing.getText());
             editing.setVisible(false);
@@ -682,15 +691,19 @@ public class ChatController implements Initializable, MessageProcessor {
         editing.setText(renameGroup.getTitle());
         editing.setVisible(true);
         editing.requestFocus();
-        editing.focusedProperty().addListener(e -> {
-            if (!editing.isFocused() && editing.isVisible()){
-                methodRenameGroup(editing.getText());
-                editing.setVisible(false);
+        listener = new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (!editing.isFocused() && editing.isVisible()){
+                    methodRenameGroup(editing.getText());
+                    editing.setVisible(false);
+                }
             }
-        });
+        };
+        editing.focusedProperty().addListener(listener);
         editing.setOnAction(e -> {
             methodRenameGroup(editing.getText());
-            editing.setVisible(false);;
+            editing.setVisible(false);
         });
     }
 
