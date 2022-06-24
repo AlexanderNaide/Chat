@@ -203,7 +203,7 @@
                     <Insets right="6.0" top="6.0" />
                 </HBox.margin>
 
-                <TreeView fx:id="contactPanel" onDragDetected="#OnDragDetected" onMouseDragged="#OnMouseDragger" onMouseReleased="#OnMouseReleased" prefHeight="400.0" prefWidth="200.0">
+                <TreeView fx:id="contactPanel" onDragDetected="#OnDragDetected" onMouseClicked="#onMouseClicked" onMouseDragged="#OnMouseDragger" onMouseReleased="#OnMouseReleased" prefHeight="400.0" prefWidth="150.0">
 
                </TreeView>
 
@@ -251,5 +251,6 @@
         </HBox>
     </VBox>
    <ImageView fx:id="dragContact" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false" />
+   <TextField fx:id="editing" visible="false" />
 
 </AnchorPane>
