@@ -24,6 +24,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.w3c.dom.ls.LSOutput;
 import ru.gb.Chatterbox.client.lang.Language;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
@@ -46,7 +47,7 @@ import static ru.gb.Chatterbox.client.lang.lang.RUSSIAN;
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 
-public class ChatController implements Initializable, MessageProcessor {
+public class ChatController<s> implements Initializable, MessageProcessor {
 
     public TreeView <String> contactPanel;
     public AnchorPane anchorPane;
