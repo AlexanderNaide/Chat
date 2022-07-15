@@ -5,7 +5,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,16 +21,11 @@ import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.w3c.dom.ls.LSOutput;
 import ru.gb.Chatterbox.client.lang.Language;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +33,6 @@ import java.net.URL;
 import java.nio.IntBuffer;
 import java.util.*;
 import java.util.List;
-
 import static javafx.scene.Cursor.*;
 import static ru.gb.Chatterbox.client.Application.primaryStage;
 import static ru.gb.Chatterbox.client.lang.lang.ENGLISH;
@@ -132,9 +125,6 @@ public class ChatController<s> implements Initializable, MessageProcessor {
                 forMessage.append(" ").append("ALL");
             } else {
                 for (TreeItem<String> item : selectionModel.getSelectedItems()) {
-//                    String[] split = item.getValue().split(" ");
-//                    String recipient = split[1];
-//                    String recipient = getStringItem(item.getValue());
                     String recipient = getStringItem(item.getValue());
                     System.out.println(recipient);
                     forMessage.append(" ").append(recipient).append(",");
@@ -143,9 +133,7 @@ public class ChatController<s> implements Initializable, MessageProcessor {
                             networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + s + REGEX + text);
                         }
                     } else {
-//                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + recipient + REGEX + text);
                         System.out.println(item.getParent().getValue());
-//                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + getUser(groups.get(item.getParent().getValue()), recipient).getNick() + REGEX + text);
                         networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + getUser(groups.get(getStringItem(item.getParent().getValue())), recipient).getNick() + REGEX + text);
                     }
                 }
@@ -153,7 +141,6 @@ public class ChatController<s> implements Initializable, MessageProcessor {
                     forMessage.deleteCharAt(forMessage.length() - 1);
                 }
             }
-//            text = language.text("[Message for") + forMessage + ":] " + text;
             text = language.text("Message for") + forMessage + ":\n    " + text;
             chatArea.appendText(text + System.lineSeparator());
             inputField.clear();
@@ -231,24 +218,10 @@ public class ChatController<s> implements Initializable, MessageProcessor {
                     item.setValue("grOff " + g.getTitle());
                 }
             }
-
-//            if (g.getTitle().equals("ALL")  && groups.get("ALL").getUsers().isEmpty()){
-//                item.setValue("grOff " + g.getTitle());
-//            } else {
-//                for (String nick : g.getUsers().keySet()) {
-//                    if (groups.get("ALL").getUsers().containsKey(nick) && !groups.get("ALL").getUsers().isEmpty()) {
-//                        item.setValue("grOn " + g.getTitle());
-//                        break;
-//                    } else {
-//                        item.setValue("grOff " + g.getTitle());
-//                    }
-//                }
-//            }
             root.getChildren().add(item);
             item.setExpanded(g.getUnfold());
             for (String s : g.getUsers().keySet()) {
                 TreeItem <String> childrenItem;
-//                if (allUsers.getUsers().containsKey(s)){
                 if (g.getUsers().get(s).getIsOnline()){
                     childrenItem = new TreeItem<>("usOn " + g.getUsers().get(s).getName());
                 } else {
@@ -467,31 +440,20 @@ public class ChatController<s> implements Initializable, MessageProcessor {
             }
             int nom = (int) (n/cellSize);
             Group recipientG;
-//            String parent;
             if (contactPanel.getTreeItem(nom).getParent().getValue() == null){
                 recipientG = groups.get(getStringItem(contactPanel.getTreeItem(nom).getValue()));
-//                parent = contactPanel.getTreeItem(nom).getValue();
             } else {
                 recipientG = groups.get(getStringItem(contactPanel.getTreeItem(nom).getParent().getValue()));
-//                parent = contactPanel.getTreeItem(nom).getParent().getValue();
             }
-//            parent = getStringItem(parent);
             for (TreeItem<String> item : movingContacts){
                 if (item.getParent().getValue() == null){
                     break;
                 }
-//                Group donorG = groups.get(item.getParent().getValue().substring(item.getParent().getValue().indexOf(" ") + 1));
                 Group donorG = groups.get(getStringItem(item.getParent().getValue()));
-//                if (donorG.getTitle().equals(parent)){
                 if (donorG.equals(recipientG)){
                     break;
                 }
-
-//                User user = groups.get(donorG.getTitle()).getUsers().get(item.getValue().substring(item.getValue().indexOf(" ") + 1));
-//                User user = donorG.getUsers().get(getStringItem(item.getValue()));
                 User user = getUser(donorG, getStringItem(item.getValue()));
-
-//                groups.get(parent).add(user);
                 recipientG.add(user);
                 if (!donorG.getTitle().equals("ALL")){
                     donorG.remove(user);
