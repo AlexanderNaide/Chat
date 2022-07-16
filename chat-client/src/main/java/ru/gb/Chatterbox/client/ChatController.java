@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
+import javafx.css.Style;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,11 +17,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import ru.gb.Chatterbox.client.lang.Language;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
@@ -68,6 +71,8 @@ public class ChatController<s> implements Initializable, MessageProcessor {
     public VBox componentContactList;
     public ImageView dragContact;
     public TextField editing;
+    public AnchorPane scrollContactPane;
+    public VBox scrollContactList;
     @FXML
     private Button add;
     @FXML
@@ -159,6 +164,24 @@ public class ChatController<s> implements Initializable, MessageProcessor {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+
+        Label label1 = new Label("ghghghghgh");
+        label1.setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
+
+        Label label2 = new Label("привет");
+        Label label3 = new Label("мамашка");
+        label3.setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+        Label label4 = new Label("гироскутер");
+
+        label4.setOnMouseClicked(e -> {
+            label4.setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+        });
+
+        scrollContactList.getChildren().add(label1);
+        scrollContactList.getChildren().add(label2);
+        scrollContactList.getChildren().add(label3);
+        scrollContactList.getChildren().add(label4);
 
         networkService = new NetworkService(this);
         language = new Language(this);
