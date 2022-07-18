@@ -10,7 +10,39 @@
     -fx-background-color: red;
 }*/
 
+.list-cell:odd {
+    -fx-cell-hover-color: #0093ff;
+    -fx-background-color: white;
+}
 
+.list-cell:even {
+    -fx-cell-hover-color: #0093ff;
+    -fx-background-color: white;
+}
+
+.my-label {
+/*    -fx-background-color: linear-gradient(#328BDB 0.0%, #207BCF 25.0%, #1973C9 75.0%, #0A65BF 100.0%);*/
+    -fx-border-width: 3;
+/*     -fx-effect: dropshadow(gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );*/
+}
+
+.my-label2{
+    -fx-background-color: linear-gradient(#328BDB 0.0%, #207BCF 25.0%, #1973C9 75.0%, #0A65BF 100.0%);
+    -fx-text-fill: white;
+    -fx-background-radius: 2;
+}
+
+.my-label:selected:focused, .my-label:selected, .my-label:selected, .my-label:pressed{
+    -fx-background-color: linear-gradient(#328BDB 0.0%, #207BCF 25.0%, #1973C9 75.0%, #0A65BF 100.0%);
+    -fx-text-fill: white;
+    -fx-background-radius: 2;
+}
+
+.my-label:filled:selected:focused, .my-label:filled:selected, .my-label:filled:selected, .my-label:filled:pressed{
+    -fx-background-color: linear-gradient(#328BDB 0.0%, #207BCF 25.0%, #1973C9 75.0%, #0A65BF 100.0%);
+    -fx-text-fill: white;
+    -fx-background-radius: 2;
+}
 
 .tree-cell:hover {
 /*    -fx-background-color: #0093ff ;*/

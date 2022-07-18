@@ -2,10 +2,8 @@ package ru.gb.Chatterbox.client.lang;
 
 import ru.gb.Chatterbox.client.ChatController;
 
-import static ru.gb.Chatterbox.client.lang.lang.ENGLISH;
-
 public class Language {
-
+    
     private String lang;
     Translate rus = new rus();
     ChatController chat;
@@ -49,4 +47,5 @@ public class Language {
 
     }
 }
+
 
