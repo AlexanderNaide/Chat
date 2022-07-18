@@ -25,6 +25,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import ru.gb.Chatterbox.client.Contact.ContactPanel;
 import ru.gb.Chatterbox.client.lang.Language;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
@@ -166,22 +167,7 @@ public class ChatController<s> implements Initializable, MessageProcessor {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
 
-        Label label1 = new Label("ghghghghgh");
-        label1.setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
-
-        Label label2 = new Label("привет");
-        Label label3 = new Label("мамашка");
-        label3.setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
-        Label label4 = new Label("гироскутер");
-
-        label4.setOnMouseClicked(e -> {
-            label4.setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
-        });
-
-        scrollContactList.getChildren().add(label1);
-        scrollContactList.getChildren().add(label2);
-        scrollContactList.getChildren().add(label3);
-        scrollContactList.getChildren().add(label4);
+        ContactPanel contactPanel = new ContactPanel(scrollContactList);
 
         networkService = new NetworkService(this);
         language = new Language(this);
