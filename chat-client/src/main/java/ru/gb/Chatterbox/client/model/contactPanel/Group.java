@@ -6,12 +6,13 @@ import ru.gb.Chatterbox.client.view.contactPanel.condition.ConditionGroup;
 import ru.gb.Chatterbox.client.view.contactPanel.condition.ConditionItem;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Group extends Title{
-    private final Map <Integer, User> users = new HashMap<>();
+    private final ArrayList<User> users = new ArrayList<>();
     private String title;
     private boolean unfold;
 
@@ -36,21 +37,20 @@ public class Group extends Title{
         return unfold;
     }
 
-    public void add(Integer nom, User name){
-        users.put(nom, name);
+    public void add(User name){
+        users.add(name);
     }
 
-    public void remove(Integer nom){
-        users.remove(nom);
+    public void remove(User user){
+        users.remove(user);
     }
 
-    public Map <Integer, User> getUsers(){
+    public ArrayList <User> getUsers(){
         return users;
     }
 
     @Override
-    public Pane visit(ConditionItem conditionItem) {
-
-        return conditionItem.createPane(title);
+    public Pane visit(ConditionItem.Visitor visitor) {
+        return visitor.conditionSelect(this);
     }
 }

@@ -1,15 +1,13 @@
 package ru.gb.Chatterbox.client.model.contactPanel;
 
-import javafx.scene.layout.Pane;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Contacts{
+public class Users {
 
     private final HashMap<String, User> list = new HashMap<>();
 
-    public Contacts initialise(){
+    public Users initialise(){
         list.put("Толик", new User("Толик", true, false));
         list.put("Ваня", new User("Ваня", false, false));
         list.put("Рома", new User("Рома", false, false));
@@ -20,10 +18,6 @@ public class Contacts{
         return this;
     }
 
-    public User getUser(String nick){
-        return list.get(nick);
-    }
-
     public void addUser(User user){
         list.put(user.getNick(), user);
     }
@@ -32,7 +26,11 @@ public class Contacts{
         list.remove(user.getNick());
     }
 
-    public HashMap<String, User> getList(){
-        return list;
+    public User get(String str){
+        return list.get(str);
+    }
+
+    public boolean contains (String str){
+        return list.containsKey(str);
     }
 }

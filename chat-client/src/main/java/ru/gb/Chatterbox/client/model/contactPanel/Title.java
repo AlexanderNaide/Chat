@@ -5,6 +5,6 @@ import ru.gb.Chatterbox.client.view.contactPanel.condition.ConditionItem;
 
 public abstract class Title {
 
-    public abstract Pane visit (ConditionItem conditionItem);
+    public abstract Pane visit (ConditionItem.Visitor visitor);
 
 }

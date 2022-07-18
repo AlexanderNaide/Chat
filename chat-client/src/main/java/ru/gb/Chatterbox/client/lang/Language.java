@@ -30,7 +30,7 @@ public class Language {
 
     public void redrawing(String lang){
         this.lang = lang;
-        chat.contactPanel.refresh();
+        chat.contactPanel_____Old.refresh();
         chat.btnSend.setText(text("SEND"));
 
         chat.labelRegOnLogin.setText(text("Registration"));

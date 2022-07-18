@@ -25,8 +25,8 @@ public class User extends Title{
     }
 
     @Override
-    public Pane visit(ConditionItem conditionItem) {
-        return conditionItem.createPane(getName());
+    public Pane visit(ConditionItem.Visitor visitor) {
+        return visitor.conditionSelect(this);
     }
 
     public void setName(String name){

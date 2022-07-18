@@ -1,11 +1,13 @@
 package ru.gb.Chatterbox.client.view.contactPanel;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import ru.gb.Chatterbox.client.model.contactPanel.Group;
 import ru.gb.Chatterbox.client.model.contactPanel.Groups;
+import ru.gb.Chatterbox.client.model.contactPanel.Title;
 import ru.gb.Chatterbox.client.model.contactPanel.User;
 import ru.gb.Chatterbox.client.view.contactPanel.condition.ConditionGroup;
 import ru.gb.Chatterbox.client.view.contactPanel.condition.ConditionItem;
@@ -14,10 +16,13 @@ import ru.gb.Chatterbox.client.view.contactPanel.condition.ConditionUserOnLine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ContactPanel {
 
     private ListView <Pane> contactList;
+    private HashMap <Integer, Title> titleMap;
+    ConditionItem.Visitor visitor = new ConditionItem.Visitor();
 
     private ContactPanel(){}
 
@@ -26,22 +31,29 @@ public class ContactPanel {
         contactList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
-    public void updateItems(HashMap<Integer, Group> list) {
-        ConditionGroup conditionGroup = new ConditionGroup();
-        ConditionUserOnLine conditionUserOnLine = new ConditionUserOnLine();
-        ConditionUserOffLine conditionUserOffLine = new ConditionUserOffLine();
-
-        for (Integer nom : list.keySet()) {
-            Group group = list.get(nom);
-            contactList.getItems().add(group.visit(conditionGroup));
-            for (User user : group.getUsers().values()) {
-                if (user.getIsOnline()){
-                    contactList.getItems().add(user.visit(conditionUserOnLine));
-                } else {
-                    contactList.getItems().add(user.visit(conditionUserOffLine));
+    public void updateItems(ArrayList<Group> list) {
+        titleMap = new HashMap<>();
+        int count = 0;
+        for (Group group : list) {
+            titleMap.put(count++, group);
+            if (group.getUnfold()){
+                for (User user : group.getUsers()) {
+                    titleMap.put(count++, user);
                 }
             }
         }
+
+        for (Title value : titleMap.values()) {
+            contactList.getItems().add(value.visit(visitor));
+        }
+    }
+
+    public ArrayList<Title> getSelectedItems(List<Integer> list){
+        ArrayList<Title> selectedItems = new ArrayList<>();
+        for (Integer integer : list) {
+            selectedItems.add(titleMap.get(integer));
+        }
+        return selectedItems;
     }
 
 
@@ -123,15 +135,5 @@ public class ContactPanel {
 //        contactList.requestFocus();
 
 //    }
-
-
-    public double getMinWidth() {
-        return contactList.getMinWidth();
-    }
-
-    public double getMaxWidth() {
-        return contactList.getMaxWidth();
-    }
-
 
 }
