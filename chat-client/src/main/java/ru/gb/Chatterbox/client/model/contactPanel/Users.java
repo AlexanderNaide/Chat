@@ -33,4 +33,20 @@ public class Users {
     public boolean contains (String str){
         return list.containsKey(str);
     }
+
+    public void setAllOnlineStatus(ArrayList <String> serverList){
+        for (String contact : list.keySet()) {
+            if(serverList.contains(contact)){
+                list.get(contact).setIsOnLine(true);
+                serverList.remove(contact);
+            } else {
+                list.get(contact).setIsOnLine(false);
+            }
+        }
+        while (serverList.size() > 0){
+            String serverContact = serverList.get(0);
+            list.put(serverContact, new User(serverContact, true, true));
+            serverList.remove(serverContact);
+        }
+    }
 }

@@ -48,8 +48,8 @@ public class NetworkService {
         out.writeUTF(message);
     }
 
-    public boolean isConnected(){
-        return socket != null && socket.isConnected() && !socket.isClosed();
+    public boolean isNotConnected(){
+        return socket == null || !socket.isConnected() || socket.isClosed();
     }
 
     public void shutdown() throws IOException {

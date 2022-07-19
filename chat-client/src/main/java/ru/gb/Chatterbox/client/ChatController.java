@@ -14,7 +14,6 @@ import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
@@ -22,10 +21,10 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import ru.gb.Chatterbox.client.lang.Language;
+import ru.gb.Chatterbox.client.model.ChatModel;
 import ru.gb.Chatterbox.client.model.contactPanel.*;
 import ru.gb.Chatterbox.client.model.contactPanel.Group;
-import ru.gb.Chatterbox.client.view.contactPanel.ContactPanel;
+import ru.gb.Chatterbox.client.view.ChatView;
 import ru.gb.Chatterbox.client.net.MessageProcessor;
 import ru.gb.Chatterbox.client.net.NetworkService;
 import ru.gb.Chatterbox.enums.Command;
@@ -43,7 +42,7 @@ import static ru.gb.Chatterbox.client.lang.lang.RUSSIAN;
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 
-public class ChatController<s> implements Initializable, MessageProcessor {
+public class ChatController<s> extends ChatView implements Initializable, MessageProcessor {
 
     public TreeView <String> contactPanel_____Old;
     public AnchorPane anchorPane;
@@ -73,7 +72,7 @@ public class ChatController<s> implements Initializable, MessageProcessor {
     public TextField editing;
     public AnchorPane scrollContactPane;
     public VBox scrollContactList;
-    public ListView<Pane> contactList;
+//    public ListView<Pane> contactList;
     @FXML
     private Button add;
     @FXML
@@ -94,8 +93,8 @@ public class ChatController<s> implements Initializable, MessageProcessor {
     private TextField LoginField;
     @FXML
     private VBox mainPanel;
-    @FXML
-    private TextArea chatArea;
+//    @FXML
+//    private TextArea chatArea;
     private ListView<String> contacts;
     @FXML
     private TextField inputField;
@@ -104,13 +103,14 @@ public class ChatController<s> implements Initializable, MessageProcessor {
     private String user;
 //    private static Map <String, ru.gb.Chatterbox.client.model.contactPanel.Group> groups;
     private TreeItem <String> root;
-    private Language language;
+//    private Language language;
     private double cellSize;
     private ObservableList<TreeItem<String>> movingContacts;
-    ContactPanel contactPanel;
+//    ContactPanel contactPanel;
     private ru.gb.Chatterbox.client.model.contactPanel.Group allUsers;
     public Users users;
     public Groups groups;
+    private ChatModel chatModel;
 
     public void mockAction(ActionEvent actionEvent) {
         System.out.println("mock");
@@ -120,220 +120,80 @@ public class ChatController<s> implements Initializable, MessageProcessor {
         Platform.exit();
     }
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        chatModel = new ChatModel();
+        super.setGroups(chatModel.getGroups());
+        updateItems();
+        networkService = new NetworkService(this);
+
+        File usersArchive = new File(String.valueOf(getClass().getResource("users.txt")));
+        File groupsArchive = new File(String.valueOf(getClass().getResource("groups.txt")));
+
+    }
+
     public void sendMessage(ActionEvent actionEvent) {
         try{
             String text = inputField.getText();
             if (text == null || text.isBlank()) {
                 return;
             }
-            StringBuilder forMessage = new StringBuilder();
-            ArrayList<Title> list = contactPanel.getSelectedItems(contactList.getSelectionModel().getSelectedIndices());
+            appendMessage(text);
+            ArrayList <Title> list = getSelectedIndexes();
             if(list.isEmpty()){
-                networkService.sendMessage(BROADCAST_MESSAGE.getCommand() + REGEX + text);
-                forMessage.append(" ").append("ALL");
+                networkService.sendMessage(chatModel.getSendText(text));
             } else {
                 for (Title title : list) {
                     if (title instanceof User user){
-                        String recipient = user.getName();
-                        forMessage.append(" ").append(recipient).append(",");
-                        networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + user.getNick() + REGEX + text);
+                        networkService.sendMessage(chatModel.getSendText(text, user.getNick()));
                     } else {
                         Group group = (Group) title;
-                        String recipient = group.getTitle();
-                        forMessage.append(" ").append(recipient).append(",");
                         for (User user : group.getUsers()) {
-//                            String recipient = user.getName();
-//                            forMessage.append(" ").append(recipient).append(",");
-                            networkService.sendMessage(PRIVATE_MESSAGE.getCommand() + REGEX + user.getNick() + REGEX + text);
+                            networkService.sendMessage(chatModel.getSendText(text, user.getNick()));
                         }
                     }
                 }
-                if (!forMessage.isEmpty()) {
-                    forMessage.deleteCharAt(forMessage.length() - 1);
-                }
             }
-            text = language.text("Message for") + forMessage + ":\n    " + text;
-            chatArea.appendText(text + System.lineSeparator());
             inputField.clear();
         }catch (IOException e){
-            showError(language.text("Network error."));
+            showError("Network error.");
         }
-    }
-
-    private void showError(String s) {
-        Alert alert = new Alert(Alert.AlertType.ERROR,
-                s,
-                ButtonType.CLOSE
-                );
-        alert.showAndWait();
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
-
-        contactPanel = new ContactPanel(contactList);
-        users = new Users().initialise();
-        groups = new Groups().initialise(users);
-        contactPanel.updateItems(groups.getList());
-        networkService = new NetworkService(this);
-        language = new Language(this);
-
-
-
-
-        cellSize = 25.0;
-//        groups = new HashMap<>();
-        allUsers = new ru.gb.Chatterbox.client.model.contactPanel.Group("ALL");
-        allUsers.setUnfold(false);
-//        groups.put(allUsers.getTitle(), allUsers);
-
-        File usersArchive = new File(String.valueOf(getClass().getResource("users.txt")));
-        File groupsArchive = new File(String.valueOf(getClass().getResource("groups.txt")));
-
-//        if(usersArchive.length() != 0){
-//            downloadUsers(usersArchive, allUsers);
-//        }
-//        setItems(false);
-    }
-
-    private void setItems(boolean is) {
-//        if (is){
-//        runContact();
-//        }
-
-        root = new TreeItem<>();
-        for (Group g : groups.getList()) {
-            TreeItem <String> item = new TreeItem<>();
-
-            for (User user : g.getUsers()) {
-                if (user.getIsOnline()) {
-                    item.setValue("grOn " + g.getTitle());
-                    break;
-                } else {
-                    item.setValue("grOff " + g.getTitle());
-                }
-            }
-            root.getChildren().add(item);
-            item.setExpanded(g.getUnfold());
-//            for (String s : g.getUsers().keySet()) {
-//                TreeItem <String> childrenItem;
-//                if (g.getUsers().get(s).getIsOnline()){
-//                    childrenItem = new TreeItem<>("usOn " + g.getUsers().get(s).getName());
-//                } else {
-//                    childrenItem = new TreeItem<>("usOff " + g.getUsers().get(s).getName());
-//                }
-//                item.getChildren().add(childrenItem);
-//            }
-        }
-        contactPanel_____Old.setFixedCellSize(cellSize);
-        contactPanel_____Old.setShowRoot(false);
-        contactPanel_____Old.setRoot(root);
-        contactPanel_____Old.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        contactPanel_____Old.setCellFactory(tv -> new TreeCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText("");
-                } else {
-                    String[] row = item.split(" ");
-                    switch (row[0]){
-                        case "grOn" -> {
-                            setText(language.text(getStringItem(item)));
-                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
-                        }
-                        case "usOn" -> {
-                            setText(language.text(getStringItem(item)));
-                            setStyle(" -fx-font-style: italic;");
-                        }
-                        case "usOff" -> {
-                            setText(language.text(getStringItem(item)));
-                            setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
-                        }
-                        default -> {
-                            setText(language.text(getStringItem(item)));
-                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-//    public void runContact(){
-//        for (TreeItem<String> a : contactPanel_____Old.getRoot().getChildren()) {
-//            ru.gb.Chatterbox.client.model.contactPanel.Group g = groups.get(getStringItem(a.getValue()));
-//            g.setUnfold(a.expandedProperty().getValue());
-//        }
-//    }
-
-//    private void setItems(String oldTitle, String newTitle) {
-//        runContact(oldTitle, newTitle);
-//        setItems(false);
-//    }
-
-//    public void runContact(String oldTitle, String newTitle){
-//        for (TreeItem<String> a : contactPanel_____Old.getRoot().getChildren()) {
-//            if (getStringItem(a.getValue()).equals(oldTitle)){
-//                ru.gb.Chatterbox.client.model.contactPanel.Group g = groups.get(newTitle);
-//                g.setUnfold(a.expandedProperty().getValue());
-//            } else {
-//                ru.gb.Chatterbox.client.model.contactPanel.Group g = groups.get(getStringItem(a.getValue()));
-//                g.setUnfold(a.expandedProperty().getValue());
-//            }
-//        }
-//    }
-
-    private void downloadUsers(File usersArchive, ru.gb.Chatterbox.client.model.contactPanel.Group allUsers) {
-
-    }
-
-    public void helpAction(ActionEvent actionEvent) throws IOException {
-        FXMLLoader hLoader = new FXMLLoader();
-        hLoader.setLocation(this.getClass().getResource("/HelpWindow.fxml"));
-        Parent hParent = hLoader.load();
-        Scene helpScene = new Scene(hParent);
-        Stage helpWindow = new Stage();
-        helpWindow.setTitle("Help");
-        helpWindow.setScene(helpScene);
-        helpWindow.show();
     }
 
     @Override
     public void processMessage(String message) {
-
         Platform.runLater(() -> parseMessage(message));
     }
 
     private void parseMessage(String message){
-
         String[] split = message.split(REGEX);
         Command command = Command.getByCommand(split[0]);
-
         switch (command){
             case AUTH_OK -> authOk(split);
             case ERROR_MESSAGE -> showError(split[1]);
-            case LIST_USERS -> parseUsers(split);
-            default -> chatArea.appendText(split[1] + System.lineSeparator());
+            case LIST_USERS -> {
+                chatModel.parseUsers(split, user);
+                updateItems();
+            }
+            default -> appendText(split[1]);
         }
     }
 
-    private void parseUsers(String[] split){
-        List <String> contact = new ArrayList<>(Arrays.asList(split));
-        contact.remove(0);
-        contact.remove(user);
-        for (String s : contact) {
-            if (users.contains(s)){
-                users.get(s).setIsOnLine(true);
-            } else {
-                User user = new User(s);
-                user.setIsOnLine(true);
-                users.addUser(user);
-            }
-        }
-    }
+//    private void parseUsers(String[] split){
+//        List <String> contact = new ArrayList<>(Arrays.asList(split));
+//        contact.remove(0);
+//        contact.remove(user);
+//        for (String s : contact) {
+//            if (users.contains(s)){
+//                users.get(s).setIsOnLine(true);
+//            } else {
+//                User user = new User(s);
+//                user.setIsOnLine(true);
+//                users.addUser(user);
+//            }
+//        }
+//    }
 
     private void authOk(String[] split){
         user = split[1];
@@ -378,7 +238,7 @@ public class ChatController<s> implements Initializable, MessageProcessor {
         String msg = AUTH_MESSAGE.getCommand() + REGEX + login + REGEX + password;
 
         try{
-            if (!networkService.isConnected()) {
+            if (networkService.isNotConnected()) {
                 networkService.connect();
             }
             networkService.sendMessage(msg);
@@ -398,7 +258,7 @@ public class ChatController<s> implements Initializable, MessageProcessor {
         String msg = CREATE_MESSAGE.getCommand() + REGEX + login + REGEX + password + REGEX + newNick;
 
         try{
-            if (!networkService.isConnected()) {
+            if (networkService.isNotConnected()) {
                 networkService.connect();
             }
             networkService.sendMessage(msg);
@@ -463,7 +323,6 @@ public class ChatController<s> implements Initializable, MessageProcessor {
 //                    donorG.remove(user);
                 }
             }
-            setItems(true);
             movingContacts = null;
             dragContact.setVisible(false);
             contactPanel_____Old.setCursor(DEFAULT);
