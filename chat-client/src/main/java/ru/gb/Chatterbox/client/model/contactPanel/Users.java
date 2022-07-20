@@ -34,6 +34,10 @@ public class Users {
         return list.containsKey(str);
     }
 
+    public HashMap<String, User> getList() {
+        return list;
+    }
+
     public void setAllOnlineStatus(ArrayList <String> serverList){
         for (String contact : list.keySet()) {
             if(serverList.contains(contact)){

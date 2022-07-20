@@ -46,17 +46,17 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
 
     public TreeView <String> contactPanel_____Old;
     public AnchorPane anchorPane;
-    public VBox registrationPanel;
+//    public VBox registrationPanel;
     public TextField newLoginField;
     public TextField newPasswordField;
-    public CheckMenuItem englishSel;
-    public CheckMenuItem russianSel;
-    public ToggleGroup langAutGroup;
-    public ToggleGroup langRegGroup;
-    public ToggleButton setAEnglish;
-    public ToggleButton setARussian;
-    public ToggleButton setREnglish;
-    public ToggleButton setRRussian;
+//    public CheckMenuItem englishSel;
+//    public CheckMenuItem russianSel;
+//    public ToggleGroup langAutGroup;
+//    public ToggleGroup langRegGroup;
+//    public ToggleButton setAEnglish;
+//    public ToggleButton setARussian;
+//    public ToggleButton setREnglish;
+//    public ToggleButton setRRussian;
     public Label labelRegOnLogin;
     public Label labelLoginOnLogin;
     public Label labelPasswordOnLogin;
@@ -72,7 +72,8 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
     public TextField editing;
     public AnchorPane scrollContactPane;
     public VBox scrollContactList;
-//    public ListView<Pane> contactList;
+//    public ListView contactList;
+    //    public ListView<Pane> contactList;
     @FXML
     private Button add;
     @FXML
@@ -85,14 +86,14 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
     private TextField newNickField;
     private TextField newPassField;
     private TextField oldPassField;
-    @FXML
-    private VBox loginPanel;
+//    @FXML
+//    private VBox loginPanel;
     @FXML
     private TextField PasswordField;
     @FXML
     private TextField LoginField;
-    @FXML
-    private VBox mainPanel;
+//    @FXML
+//    private VBox mainPanel;
 //    @FXML
 //    private TextArea chatArea;
     private ListView<String> contacts;
@@ -124,6 +125,7 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         chatModel = new ChatModel();
+        super.initialize(url, resourceBundle);
         super.setGroups(chatModel.getGroups());
         updateItems();
         networkService = new NetworkService(this);
@@ -197,11 +199,7 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
 
     private void authOk(String[] split){
         user = split[1];
-        loginPanel.setVisible(false);
-        primaryStage.setTitle("Chatterbox - " + user);
-        primaryStage.setMinHeight(578);
-        primaryStage.setMinWidth(662);
-        mainPanel.setVisible(true);
+        authOk(user);
     }
 
 //    public void sendChangeNick(ActionEvent actionEvent) {
@@ -216,17 +214,17 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
 //        //@TODO
 //    }
 
-    public void sendAuthorisationWindow(MouseEvent mouseEvent) {
-        registrationPanel.setVisible(false);
-        primaryStage.setTitle("Chatterbox");
-        loginPanel.setVisible(true);
-    }
+//    public void sendAuthorisationWindow(MouseEvent mouseEvent) {
+//        registrationPanel.setVisible(false);
+//        primaryStage.setTitle("Chatterbox");
+//        loginPanel.setVisible(true);
+//    }
 
-    public void sendRegistrationWindow(MouseEvent mouseEvent) {
-        loginPanel.setVisible(false);
-        primaryStage.setTitle("Chatterbox");
-        registrationPanel.setVisible(true);
-    }
+//    public void sendRegistrationWindow(MouseEvent mouseEvent) {
+//        loginPanel.setVisible(false);
+//        primaryStage.setTitle("Chatterbox");
+//        registrationPanel.setVisible(true);
+//    }
 
     public void sendAuth(ActionEvent actionEvent) {
         String login = LoginField.getText();
@@ -267,67 +265,67 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
         }
     }
 
-    public void selectEnglish(ActionEvent actionEvent) {
-        langAutGroup.selectToggle(setAEnglish);
-        langRegGroup.selectToggle(setREnglish);
-        language.redrawing(ENGLISH.getLanguage());
-        englishSel.setSelected(true);
-        russianSel.setSelected(false);
-    }
+//    public void selectEnglish(ActionEvent actionEvent) {
+//        langAutGroup.selectToggle(setAEnglish);
+//        langRegGroup.selectToggle(setREnglish);
+//        language.redrawing(ENGLISH.getLanguage());
+//        englishSel.setSelected(true);
+//        russianSel.setSelected(false);
+//    }
+//
+//    public void selectRussian(ActionEvent actionEvent) {
+//        langAutGroup.selectToggle(setARussian);
+//        langRegGroup.selectToggle(setRRussian);
+//        language.redrawing(RUSSIAN.getLanguage());
+//        russianSel.setSelected(true);
+//        englishSel.setSelected(false);
+//    }
 
-    public void selectRussian(ActionEvent actionEvent) {
-        langAutGroup.selectToggle(setARussian);
-        langRegGroup.selectToggle(setRRussian);
-        language.redrawing(RUSSIAN.getLanguage());
-        russianSel.setSelected(true);
-        englishSel.setSelected(false);
-    }
-
-    public User getUser (ru.gb.Chatterbox.client.model.contactPanel.Group group, String name){
-        for (User user : group.getUsers()) {
-            if (name.equals(user.getName())){
-                return user;
-            }
-        }
-        return null;
-    }
+//    public User getUser (ru.gb.Chatterbox.client.model.contactPanel.Group group, String name){
+//        for (User user : group.getUsers()) {
+//            if (name.equals(user.getName())){
+//                return user;
+//            }
+//        }
+//        return null;
+//    }
 
         //*************   Изучаемые события   ***************
 
-    public void OnMouseReleased(MouseEvent mouseEvent) {
-        if (movingContacts != null){
-            double n = mouseEvent.getY();
-            if (n > contactPanel_____Old.getExpandedItemCount() * cellSize){
-                n = (contactPanel_____Old.getExpandedItemCount() * cellSize) - 1.0;
-            }
-            int nom = (int) (n/cellSize);
-            ru.gb.Chatterbox.client.model.contactPanel.Group recipientG;
-            if (contactPanel_____Old.getTreeItem(nom).getParent().getValue() == null){
-                recipientG = groups.get(getStringItem(contactPanel_____Old.getTreeItem(nom).getValue()));
-            } else {
-                recipientG = groups.get(getStringItem(contactPanel_____Old.getTreeItem(nom).getParent().getValue()));
-            }
-            for (TreeItem<String> item : movingContacts){
-                if (item.getParent().getValue() == null){
-                    break;
-                }
-                ru.gb.Chatterbox.client.model.contactPanel.Group donorG = groups.get(getStringItem(item.getParent().getValue()));
-                if (donorG.equals(recipientG)){
-                    break;
-                }
-
-        // Удалять по номеру в списке
-                User user = getUser(donorG, getStringItem(item.getValue()));
-//                recipientG.add(user);
-                if (!donorG.getTitle().equals("ALL")){
-//                    donorG.remove(user);
-                }
-            }
-            movingContacts = null;
-            dragContact.setVisible(false);
-            contactPanel_____Old.setCursor(DEFAULT);
-        }
-    }
+//    public void OnMouseReleased(MouseEvent mouseEvent) {
+//        if (movingContacts != null){
+//            double n = mouseEvent.getY();
+//            if (n > contactPanel_____Old.getExpandedItemCount() * cellSize){
+//                n = (contactPanel_____Old.getExpandedItemCount() * cellSize) - 1.0;
+//            }
+//            int nom = (int) (n/cellSize);
+//            ru.gb.Chatterbox.client.model.contactPanel.Group recipientG;
+//            if (contactPanel_____Old.getTreeItem(nom).getParent().getValue() == null){
+//                recipientG = groups.get(getStringItem(contactPanel_____Old.getTreeItem(nom).getValue()));
+//            } else {
+//                recipientG = groups.get(getStringItem(contactPanel_____Old.getTreeItem(nom).getParent().getValue()));
+//            }
+//            for (TreeItem<String> item : movingContacts){
+//                if (item.getParent().getValue() == null){
+//                    break;
+//                }
+//                ru.gb.Chatterbox.client.model.contactPanel.Group donorG = groups.get(getStringItem(item.getParent().getValue()));
+//                if (donorG.equals(recipientG)){
+//                    break;
+//                }
+//
+//        // Удалять по номеру в списке
+//                User user = getUser(donorG, getStringItem(item.getValue()));
+////                recipientG.add(user);
+//                if (!donorG.getTitle().equals("ALL")){
+////                    donorG.remove(user);
+//                }
+//            }
+//            movingContacts = null;
+//            dragContact.setVisible(false);
+//            contactPanel_____Old.setCursor(DEFAULT);
+//        }
+//    }
 
     public void OnDragDetected(MouseEvent mouseEvent) throws IOException {
         movingContacts = contactPanel_____Old.getSelectionModel().getSelectedItems();
@@ -388,65 +386,65 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
         return bufferedImage;
     }
 
-    public void OnMouseDragger(MouseEvent mouseEvent) {
-
-        dragContact.setX(mouseEvent.getSceneX() - mouseEvent.getX());
-        dragContact.setY(mouseEvent.getSceneY());
-
-        double n = mouseEvent.getY();
-        if (n >= contactPanel_____Old.getExpandedItemCount() * cellSize){
-            n = (contactPanel_____Old.getExpandedItemCount() * cellSize) - 1.0;
-        }
-        int nom = (int) (n/cellSize);
-        int nomF = 0;
-
-        for (int i = nom; i > 0; i--) {
-            if (contactPanel_____Old.getTreeItem(i).getParent().getValue() == null){
-                nomF = i;
-                break;
-            }
-        }
-        final int[] count = new int[1];
-
-        int finalNomF = nomF;
-        contactPanel_____Old.setCellFactory(tv -> new TreeCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText("");
-                } else {
-                    String[] row = item.split(" ");
-                    switch (row[0]){
-                        case "grOn" -> {
-                            setText(language.text(getStringItem(item)));
-                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
-                            if (finalNomF == count[0]){
-                                setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic;");
-                            }
-                        }
-                        case "usOn" -> {
-                            setText(language.text(getStringItem(item)));
-                            setStyle(" -fx-font-style: italic;");
-                        }
-                        case "usOff" -> {
-                            setText(language.text(getStringItem(item)));
-                            setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
-                        }
-                        default -> {
-                            setText(language.text(getStringItem(item)));
-                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
-                            if (finalNomF == count[0]){
-                                setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
-                            }
-                        }
-                    }
-                    count[0]++;
-                }
-            }
-        });
-
-    }
+//    public void OnMouseDragger(MouseEvent mouseEvent) {
+//
+//        dragContact.setX(mouseEvent.getSceneX() - mouseEvent.getX());
+//        dragContact.setY(mouseEvent.getSceneY());
+//
+//        double n = mouseEvent.getY();
+//        if (n >= contactPanel_____Old.getExpandedItemCount() * cellSize){
+//            n = (contactPanel_____Old.getExpandedItemCount() * cellSize) - 1.0;
+//        }
+//        int nom = (int) (n/cellSize);
+//        int nomF = 0;
+//
+//        for (int i = nom; i > 0; i--) {
+//            if (contactPanel_____Old.getTreeItem(i).getParent().getValue() == null){
+//                nomF = i;
+//                break;
+//            }
+//        }
+//        final int[] count = new int[1];
+//
+//        int finalNomF = nomF;
+//        contactPanel_____Old.setCellFactory(tv -> new TreeCell<>() {
+//            @Override
+//            protected void updateItem(String item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if (empty || item == null) {
+//                    setText("");
+//                } else {
+//                    String[] row = item.split(" ");
+//                    switch (row[0]){
+//                        case "grOn" -> {
+//                            setText(language.text(getStringItem(item)));
+//                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic;");
+//                            if (finalNomF == count[0]){
+//                                setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic;");
+//                            }
+//                        }
+//                        case "usOn" -> {
+//                            setText(language.text(getStringItem(item)));
+//                            setStyle(" -fx-font-style: italic;");
+//                        }
+//                        case "usOff" -> {
+//                            setText(language.text(getStringItem(item)));
+//                            setStyle(" -fx-font-style: italic; -fx-text-fill: Silver;");
+//                        }
+//                        default -> {
+//                            setText(language.text(getStringItem(item)));
+//                            setStyle(" -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+//                            if (finalNomF == count[0]){
+//                                setStyle("-fx-effect: innershadow(gaussian , #0093ff , 6,0,0,0 ); -fx-font-size: 1.05em; -fx-font-weight: bold; -fx-font-style: italic; -fx-text-fill: Silver;");
+//                            }
+//                        }
+//                    }
+//                    count[0]++;
+//                }
+//            }
+//        });
+//
+//    }
 
     public void OnActionDel(ActionEvent actionEvent) {
     }
@@ -457,83 +455,85 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
     public void OnMousePressedDel(MouseEvent mouseEvent) {
     }
 
-    public void onMouseClicked(MouseEvent mouseEvent) {
-        if(mouseEvent.getClickCount() == 2){
-            TreeItem<String> item = contactPanel_____Old.getFocusModel().getFocusedItem();
-            if (item.getParent().getValue() != null){
-                setNewNameContact(item, mouseEvent);
-            } else {
-                setNewNameGroup(item, mouseEvent);
-            }
-        }
-    }
+//    public void onMouseClicked(MouseEvent mouseEvent) {
+//        if(mouseEvent.getClickCount() == 2){
+//            TreeItem<String> item = contactPanel_____Old.getFocusModel().getFocusedItem();
+//            if (item.getParent().getValue() != null){
+//                setNewNameContact(item, mouseEvent);
+//            } else {
+//                setNewNameGroup(item, mouseEvent);
+//            }
+//        }
+//    }
 
     private User renameUser;
     private Group renameGroup;
     private InvalidationListener listener;
 
-    private void methodRenameUser(String newName){
-        renameUser.setName(newName);
-        editing.focusedProperty().removeListener(listener);
-        setItems(true);
-    }
+//    private void methodRenameUser(String newName){
+//        renameUser.setName(newName);
+//        editing.focusedProperty().removeListener(listener);
+//        setItems(true);
+//    }
 
-    private void methodRenameGroup(String newTitle){
-        String oldTitle = renameGroup.getTitle();
-        renameGroup.setTitle(newTitle);
-        groups.put(renameGroup.getTitle(), renameGroup);
-        groups.remove(oldTitle);
-        editing.focusedProperty().removeListener(listener);
-        setItems(oldTitle, newTitle);
-    }
+//    private void methodRenameGroup(String newTitle){
+//        String oldTitle = renameGroup.getTitle();
+//        renameGroup.setTitle(newTitle);
+//        groups.put(renameGroup.getTitle(), renameGroup);
+//        groups.remove(oldTitle);
+//        editing.focusedProperty().removeListener(listener);
+//        setItems(oldTitle, newTitle);
+//    }
 
-    public void setNewNameContact(TreeItem<String> item, MouseEvent mouseEvent){
-        renameUser = getUser(groups.get(getStringItem(item.getParent().getValue())), getStringItem(item.getValue()));
-        editing.setLayoutX(mouseEvent.getSceneX() - mouseEvent.getX());
-        editing.setLayoutY(mouseEvent.getSceneY() - (mouseEvent.getY() % cellSize) + contactPanel_____Old.getScaleX());
-        editing.setText(renameUser.getName());
-        editing.setVisible(true);
-        editing.requestFocus();
-        listener = new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                if (!editing.isFocused() && editing.isVisible()){
-                    methodRenameUser(editing.getText());
-                    editing.setVisible(false);
-                }
-            }
-        };
-        editing.focusedProperty().addListener(listener);
-        editing.setOnAction(e -> {
-            methodRenameUser(editing.getText());
-            editing.setVisible(false);
-        });
-    }
+//    public void setNewNameContact(TreeItem<String> item, MouseEvent mouseEvent){
+//        renameUser = getUser(groups.get(getStringItem(item.getParent().getValue())), getStringItem(item.getValue()));
+//        editing.setLayoutX(mouseEvent.getSceneX() - mouseEvent.getX());
+//        editing.setLayoutY(mouseEvent.getSceneY() - (mouseEvent.getY() % cellSize) + contactPanel_____Old.getScaleX());
+//        editing.setText(renameUser.getName());
+//        editing.setVisible(true);
+//        editing.requestFocus();
+//        listener = new InvalidationListener() {
+//            @Override
+//            public void invalidated(Observable observable) {
+//                if (!editing.isFocused() && editing.isVisible()){
+//                    methodRenameUser(editing.getText());
+//                    editing.setVisible(false);
+//                }
+//            }
+//        };
+//        editing.focusedProperty().addListener(listener);
+//        editing.setOnAction(e -> {
+//            methodRenameUser(editing.getText());
+//            editing.setVisible(false);
+//        });
+//    }
 
-    public void setNewNameGroup(TreeItem<String> item,  MouseEvent mouseEvent){
-        renameGroup = groups.get(getStringItem(item.getValue()));
-        editing.setLayoutX(mouseEvent.getSceneX() - mouseEvent.getX());
-        editing.setLayoutY(mouseEvent.getSceneY() - (mouseEvent.getY() % cellSize) + contactPanel_____Old.getScaleX());
-        editing.setText(renameGroup.getTitle());
-        editing.setVisible(true);
-        editing.requestFocus();
-        listener = new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                if (!editing.isFocused() && editing.isVisible()){
-                    methodRenameGroup(editing.getText());
-                    editing.setVisible(false);
-                }
-            }
-        };
-        editing.focusedProperty().addListener(listener);
-        editing.setOnAction(e -> {
-            methodRenameGroup(editing.getText());
-            editing.setVisible(false);
-        });
-    }
+//    public void setNewNameGroup(TreeItem<String> item,  MouseEvent mouseEvent){
+//        renameGroup = groups.get(getStringItem(item.getValue()));
+//        editing.setLayoutX(mouseEvent.getSceneX() - mouseEvent.getX());
+//        editing.setLayoutY(mouseEvent.getSceneY() - (mouseEvent.getY() % cellSize) + contactPanel_____Old.getScaleX());
+//        editing.setText(renameGroup.getTitle());
+//        editing.setVisible(true);
+//        editing.requestFocus();
+//        listener = new InvalidationListener() {
+//            @Override
+//            public void invalidated(Observable observable) {
+//                if (!editing.isFocused() && editing.isVisible()){
+//                    methodRenameGroup(editing.getText());
+//                    editing.setVisible(false);
+//                }
+//            }
+//        };
+//        editing.focusedProperty().addListener(listener);
+//        editing.setOnAction(e -> {
+//            methodRenameGroup(editing.getText());
+//            editing.setVisible(false);
+//        });
+//    }
 
     public String getStringItem (String item){
         return item.substring(item.indexOf(" ") + 1);
     }
 }
+
+//<!-- <TreeView fx:id="contactPanel_____Old" onDragDetected="#OnDragDetected" onMouseClicked="#onMouseClicked" onMouseDragged="#OnMouseDragger" onMouseReleased="#OnMouseReleased" prefHeight="47.0" prefWidth="150.0">-->

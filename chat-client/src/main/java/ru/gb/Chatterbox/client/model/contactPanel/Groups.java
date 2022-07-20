@@ -1,9 +1,6 @@
 package ru.gb.Chatterbox.client.model.contactPanel;
 
-import javafx.scene.layout.Pane;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Groups {
 
@@ -12,15 +9,11 @@ public class Groups {
     public Groups initialise(Users users){
 
         Group all = new Group("Все");
-        all.setUnfold(true);
+        all.setUnfold(false);
         list.add(0, all);
-        all.add(users.get("Толик"));
-        all.add(users.get("Ваня"));
-        all.add(users.get("Рома"));
-        all.add(users.get("Ира"));
-        all.add(users.get("Дашка"));
-        all.add(users.get("Женька-печенька"));
-        all.add(users.get("Танюха"));
+        for (User user : users.getList().values()) {
+            all.add(user);
+        }
 
         Group myOffice = new Group("Мой отдел");
         list.add(1, myOffice);

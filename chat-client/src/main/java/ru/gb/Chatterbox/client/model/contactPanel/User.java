@@ -3,8 +3,6 @@ package ru.gb.Chatterbox.client.model.contactPanel;
 import javafx.scene.layout.Pane;
 import ru.gb.Chatterbox.client.view.contactPanel.condition.ConditionItem;
 
-import java.util.ArrayList;
-
 public class User extends Title{
 
     private final String nick;

@@ -1,11 +1,9 @@
 package ru.gb.Chatterbox.client.model;
 
 import ru.gb.Chatterbox.client.model.contactPanel.*;
-import ru.gb.Chatterbox.client.view.contactPanel.ContactPanel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.BROADCAST_MESSAGE;

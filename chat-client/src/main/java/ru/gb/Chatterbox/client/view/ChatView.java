@@ -6,10 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -25,19 +23,32 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class ChatView implements Initializable {
+import static ru.gb.Chatterbox.client.Application.primaryStage;
+import static ru.gb.Chatterbox.client.lang.lang.ENGLISH;
+import static ru.gb.Chatterbox.client.lang.lang.RUSSIAN;
+
+public class ChatView {
+
     public ListView<Pane> contactList;
-    private ContactPanel contactPanel;
-    private Groups groups;
-    private Language language;
+    public ContactPanel contactPanel;
+    public Groups groups;
+    public Language language;
+    public VBox registrationPanel;
+    public ToggleGroup langAutGroup;
+    public ToggleGroup langRegGroup;
+    public ToggleButton setAEnglish;
+    public ToggleButton setARussian;
+    public ToggleButton setREnglish;
+    public ToggleButton setRRussian;
+    public CheckMenuItem englishSel;
+    public CheckMenuItem russianSel;
     @FXML
-    private TextArea chatArea;
-//    @FXML
-    private VBox loginPanel;
+    public TextArea chatArea;
+    @FXML
+    public VBox loginPanel;
+    @FXML
+    public VBox mainPanel;
 
-
-
-    @Override
     public void initialize(URL location, ResourceBundle resources) {
         contactPanel = new ContactPanel(contactList);
         language = new Language(this);
@@ -80,11 +91,11 @@ public class ChatView implements Initializable {
         appendText(text);
     }
 
-    protected void appendText(String text){
+    public void appendText(String text){
         chatArea.appendText(text + System.lineSeparator());
     }
 
-    protected void showError(String error) {
+    public void showError(String error) {
         Alert alert = new Alert(Alert.AlertType.ERROR,
                 language.text(error),
                 ButtonType.CLOSE
@@ -101,5 +112,41 @@ public class ChatView implements Initializable {
         helpWindow.setTitle("Help");
         helpWindow.setScene(helpScene);
         helpWindow.show();
+    }
+
+    public void authOk(String user){
+        loginPanel.setVisible(false);
+        primaryStage.setTitle("Chatterbox - " + user);
+        primaryStage.setMinHeight(578);
+        primaryStage.setMinWidth(662);
+        mainPanel.setVisible(true);
+    }
+
+    public void sendAuthorisationWindow(MouseEvent mouseEvent) {
+        registrationPanel.setVisible(false);
+        primaryStage.setTitle("Chatterbox");
+        loginPanel.setVisible(true);
+    }
+
+    public void sendRegistrationWindow(MouseEvent mouseEvent) {
+        loginPanel.setVisible(false);
+        primaryStage.setTitle("Chatterbox");
+        registrationPanel.setVisible(true);
+    }
+
+    public void selectEnglish(ActionEvent actionEvent) {
+        langAutGroup.selectToggle(setAEnglish);
+        langRegGroup.selectToggle(setREnglish);
+        language.redrawing(ENGLISH.getLanguage());
+        englishSel.setSelected(true);
+        russianSel.setSelected(false);
+    }
+
+    public void selectRussian(ActionEvent actionEvent) {
+        langAutGroup.selectToggle(setARussian);
+        langRegGroup.selectToggle(setRRussian);
+        language.redrawing(RUSSIAN.getLanguage());
+        russianSel.setSelected(true);
+        englishSel.setSelected(false);
     }
 }
