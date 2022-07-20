@@ -534,6 +534,18 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
     public String getStringItem (String item){
         return item.substring(item.indexOf(" ") + 1);
     }
+
+    public void onMouseClicked(MouseEvent mouseEvent) {
+        if(mouseEvent.getClickCount() == 2){
+            collapse(mouseEvent);
+//            TreeItem<String> item = contactPanel_____Old.getFocusModel().getFocusedItem();
+//            if (item.getParent().getValue() != null){
+//                setNewNameContact(item, mouseEvent);
+//            } else {
+////                setNewNameGroup(item, mouseEvent);
+//            }
+        }
+    }
 }
 
 //<!-- <TreeView fx:id="contactPanel_____Old" onDragDetected="#OnDragDetected" onMouseClicked="#onMouseClicked" onMouseDragged="#OnMouseDragger" onMouseReleased="#OnMouseReleased" prefHeight="47.0" prefWidth="150.0">-->

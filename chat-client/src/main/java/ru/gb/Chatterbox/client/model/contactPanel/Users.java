@@ -38,19 +38,22 @@ public class Users {
         return list;
     }
 
-    public void setAllOnlineStatus(ArrayList <String> serverList){
+    public void setAllOnlineStatus(ArrayList <String> serverContacts){
+        System.out.println("3 - " + serverContacts);
         for (String contact : list.keySet()) {
-            if(serverList.contains(contact)){
+            System.out.println("4 - " + serverContacts);
+            if(serverContacts.contains(contact)){
                 list.get(contact).setIsOnLine(true);
-                serverList.remove(contact);
+                serverContacts.remove(contact);
             } else {
                 list.get(contact).setIsOnLine(false);
             }
+            System.out.println("5 - " + serverContacts);
         }
-        while (serverList.size() > 0){
-            String serverContact = serverList.get(0);
+        while (serverContacts.size() > 0){
+            String serverContact = serverContacts.get(0);
             list.put(serverContact, new User(serverContact, true, true));
-            serverList.remove(serverContact);
+            serverContacts.remove(serverContact);
         }
     }
 }

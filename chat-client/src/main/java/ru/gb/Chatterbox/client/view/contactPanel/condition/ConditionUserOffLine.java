@@ -17,8 +17,8 @@ public class ConditionUserOffLine extends ConditionItem{
 
         circle.setCenterX(14.0f);
         circle.setCenterY(8.0f);
-        circle.setRadius(5.0f);
-        circle.setFill(Color.GREEN);
+        circle.setRadius(3.0f);
+        circle.setFill(Color.GREY);
         pane.getChildren().add(circle);
 
         Label label = new Label(title);

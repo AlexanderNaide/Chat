@@ -202,7 +202,7 @@
                 <HBox.margin>
                     <Insets right="6.0" top="6.0" />
                 </HBox.margin>
-            <ListView fx:id="contactList" prefHeight="300.0" prefWidth="150.0" />
+            <ListView fx:id="contactList" prefHeight="300.0" prefWidth="150.0" onMouseClicked="#onMouseClicked"/>
 
 
 <!--                <TreeView fx:id="contactPanel_____Old" onDragDetected="#OnDragDetected" prefHeight="47.0" prefWidth="150.0">

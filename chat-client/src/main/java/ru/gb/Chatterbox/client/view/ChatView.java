@@ -31,7 +31,6 @@ public class ChatView {
 
     public ListView<Pane> contactList;
     public ContactPanel contactPanel;
-    public Groups groups;
     public Language language;
     public VBox registrationPanel;
     public ToggleGroup langAutGroup;
@@ -56,11 +55,11 @@ public class ChatView {
     }
 
     public void setGroups(Groups groups) {
-        this.groups = groups;
+        contactPanel.setGroups(groups);
     }
 
     public void updateItems(){
-        contactPanel.updateItems(groups.getList());
+        contactPanel.updateItems();
     }
 
     public ArrayList<Title> getSelectedIndexes(){
@@ -148,5 +147,9 @@ public class ChatView {
         language.redrawing(RUSSIAN.getLanguage());
         russianSel.setSelected(true);
         englishSel.setSelected(false);
+    }
+
+    public void collapse(MouseEvent mouseEvent){
+        contactPanel.collapse(mouseEvent);
     }
 }
