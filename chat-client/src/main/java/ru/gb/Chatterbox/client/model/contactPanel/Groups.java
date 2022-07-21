@@ -10,6 +10,7 @@ public class Groups {
 
         Group all = new Group("Все");
         all.setUnfold(false);
+        users.setAllUsers(all);
         list.add(0, all);
         for (User user : users.getList().values()) {
             all.add(user);

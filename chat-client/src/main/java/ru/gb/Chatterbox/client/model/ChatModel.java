@@ -33,10 +33,8 @@ public class ChatModel {
 
     public void parseUsers(String[] split, String user){
         ArrayList <String> serverContacts = new ArrayList<>(Arrays.asList(split));
-        System.out.println("1 - " + serverContacts);
         serverContacts.remove(0);
         serverContacts.remove(user);
-        System.out.println("2 - " + serverContacts);
         users.setAllOnlineStatus(serverContacts);
     }
 }

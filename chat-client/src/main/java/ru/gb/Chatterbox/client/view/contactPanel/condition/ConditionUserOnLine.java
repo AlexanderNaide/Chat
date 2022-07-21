@@ -16,8 +16,8 @@ public class ConditionUserOnLine extends ConditionItem{
 
         circle.setCenterX(14.0f);
         circle.setCenterY(8.0f);
-        circle.setRadius(3.0f);
-        circle.setFill(Color.GREEN);
+        circle.setRadius(4.0f);
+        circle.setFill(Color.GREENYELLOW);
         pane.getChildren().add(circle);
 
         Label label = new Label(title);

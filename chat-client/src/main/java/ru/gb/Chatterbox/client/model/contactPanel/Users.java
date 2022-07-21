@@ -2,10 +2,16 @@ package ru.gb.Chatterbox.client.model.contactPanel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Users {
 
     private final HashMap<String, User> list = new HashMap<>();
+    private Group allUsers;
+
+    public void setAllUsers(Group allUsers) {
+        this.allUsers = allUsers;
+    }
 
     public Users initialise(){
         list.put("Толик", new User("Толик", true, false));
@@ -39,21 +45,19 @@ public class Users {
     }
 
     public void setAllOnlineStatus(ArrayList <String> serverContacts){
-        System.out.println("3 - " + serverContacts);
         for (String contact : list.keySet()) {
-            System.out.println("4 - " + serverContacts);
             if(serverContacts.contains(contact)){
                 list.get(contact).setIsOnLine(true);
                 serverContacts.remove(contact);
             } else {
                 list.get(contact).setIsOnLine(false);
             }
-            System.out.println("5 - " + serverContacts);
         }
         while (serverContacts.size() > 0){
             String serverContact = serverContacts.get(0);
             list.put(serverContact, new User(serverContact, true, true));
             serverContacts.remove(serverContact);
         }
+        allUsers.setUsers(new ArrayList<>(list.values()));
     }
 }

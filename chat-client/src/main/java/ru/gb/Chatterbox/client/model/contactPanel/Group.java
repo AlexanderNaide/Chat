@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Group extends Title{
-    private final ArrayList<User> users = new ArrayList<>();
+    private ArrayList<User> users = new ArrayList<>();
     private String title;
     private boolean unfold;
 
@@ -49,8 +49,13 @@ public class Group extends Title{
         return users;
     }
 
+    public void setUsers(ArrayList<User> users) {
+        this.users = users;
+    }
+
     @Override
     public Pane visit(ConditionItem.Visitor visitor) {
         return visitor.conditionSelect(this);
     }
+
 }
