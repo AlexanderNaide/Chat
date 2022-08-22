@@ -7,7 +7,7 @@
             prefWidth="400.0"
             xmlns="http://javafx.com/javafx/16"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="ru.gb.Chatterbox.client.HelpWindow">
+            fx:controller="ru.gb.Chatterbox.client.view.helpPanel.HelpWindow">
 
     <Pane>
         <TextArea fx:id="helpArea" editable="false" prefHeight="400.0" prefWidth="477.0">

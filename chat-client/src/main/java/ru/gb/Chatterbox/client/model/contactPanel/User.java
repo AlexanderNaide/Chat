@@ -1,40 +1,38 @@
-package ru.gb.Chatterbox.client;
+package ru.gb.Chatterbox.client.model.contactPanel;
 
-public class User {
+import javafx.scene.layout.Pane;
+import ru.gb.Chatterbox.client.view.contactPanel.condition.ConditionItem;
 
-    private String nick;
+public class User extends Title{
+
+    private final String nick;
     private String name;
     private boolean isOnLine;
     private boolean isNew;
 
-    public User(){
-    }
-
     public User(String nick){
         this.nick = nick;
+        this.name = nick;
     }
 
-    public User(String nick, boolean isNew){
+    public User(String nick, boolean isOnLine, boolean isNew){
         this.nick = nick;
-        if (isNew){
-            setNew();
-        }
+        this.name = nick;
+        this.isOnLine = isOnLine;
+        this.isNew = isNew;
     }
 
-    public String toString() {
-        if(name != null) {
-            return name;
-        } else {
-            return nick;
-        }
-    }
-
-    public String getNick() {
-        return nick;
+    @Override
+    public Pane visit(ConditionItem.Visitor visitor) {
+        return visitor.conditionSelect(this);
     }
 
     public void setName(String name){
         this.name = name;
+    }
+
+    public String getNick() {
+        return nick;
     }
 
     public String getName() {

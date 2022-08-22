@@ -1,20 +1,16 @@
-package ru.gb.Chatterbox.client;
+package ru.gb.Chatterbox.client.view.helpPanel;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.WritableImage;
-import javafx.scene.layout.*;
 
 import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import static ru.gb.Chatterbox.client.Application.primaryStage;
 
 public class HelpWindow implements Initializable {
 
     public TextArea helpArea;
-    public VBox mainPanel;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
