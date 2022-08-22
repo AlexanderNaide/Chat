@@ -60,7 +60,8 @@ public class inSQLUserServiceImpl implements UserService {
 
     private static void connect() throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
-        connection = DriverManager.getConnection("jdbc:sqlite:C:\\Java\\Chat\\chat-server\\SQL_ChatServer.db");
+//        connection = DriverManager.getConnection("jdbc:sqlite:C:\\Java\\Chat\\chat-server\\SQL_ChatServer.db");
+        connection = DriverManager.getConnection("jdbc:sqlite:E:\\Java\\Chat\\chat-server\\SQL_ChatServer.db");
         statement = connection.createStatement();
     }
 
