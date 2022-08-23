@@ -5,10 +5,7 @@ import ru.gb.Chatterbox.server.model.User;
 import ru.gb.Chatterbox.server.service.UserService;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -18,11 +15,7 @@ public class inSQLUserServiceImpl implements UserService {
     private static Connection connection;
     private static Statement statement;
 
-
-    private final Map<String, User> allUsers;
-
     public inSQLUserServiceImpl() {
-        this.allUsers = new HashMap<>();
     }
 
     @Override
@@ -38,18 +31,22 @@ public class inSQLUserServiceImpl implements UserService {
 
         try {
             statement.execute("CREATE TABLE IF NOT EXISTS Chat_Client_BD (" +
-                        "nick STRING PRIMARY KEY NOT NULL UNIQUE," +
-                        "log STRING NOT NULL UNIQUE," +
-                        "pas STRING NOT NULL)");
+                    "nick STRING PRIMARY KEY NOT NULL UNIQUE," +
+                    "log STRING NOT NULL UNIQUE," +
+                    "pas STRING NOT NULL)");
 
             connection.setAutoCommit(false);
             for (int i = 1; i < 6; i++) {
                 String nick = String.format("nick%d", i);
                 String log = String.format("log%d", i);
                 String pas = String.format("pass%d", i);
-                statement.execute(String.format("INSERT INTO Chat_Client_BD (nick, log, pas) VALUES ('%s', '%s', '%s')", nick, log, pas));
+                ResultSet resultSet = statement.executeQuery(String.format("SELECT EXISTS(SELECT * FROM Chat_Client_BD where nick = '%s')", nick));
+                if (resultSet.getInt(1) == 0) {
+                    statement.execute(String.format("INSERT INTO Chat_Client_BD (nick, log, pas) VALUES ('%s', '%s', '%s')", nick, log, pas));
+                }
             }
             connection.setAutoCommit(true);
+
         } catch (SQLException e) {
             e.printStackTrace();
 //            throw new RuntimeException(e);
@@ -60,7 +57,7 @@ public class inSQLUserServiceImpl implements UserService {
 
     private static void connect() throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
-        connection = DriverManager.getConnection("jdbc:sqlite:C:\\Java\\Chat\\chat-server\\SQL_ChatServer.db");
+        connection = DriverManager.getConnection("jdbc:sqlite:chat-server\\SQL_ChatServer.db");
         statement = connection.createStatement();
     }
 
@@ -81,38 +78,76 @@ public class inSQLUserServiceImpl implements UserService {
 
     @Override
     public String authenticate(String login, String password) {
-        for (User user : allUsers.values()) {
-            if (Objects.equals(login, user.getLogin()) && Objects.equals(password, user.getPassword())){
-                return user.getNick();
+        try {
+            ResultSet resultSet = statement.executeQuery(String.format("SELECT nick FROM Chat_Client_BD WHERE log = '%s' and pas = '%s'", login, password));
+            if (!resultSet.isClosed()) {
+                return resultSet.getString(1);
             }
+            else{
+                throw new WrongCredentialsException("Wrong login or password.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        throw new WrongCredentialsException("Wrong login or password.");
     }
 
     @Override
     public String changeNick(String login, String newNick) {
-        return null; //@TODO
+        try {
+            ResultSet resultNick = statement.executeQuery(String.format("SELECT EXISTS(SELECT * FROM Chat_Client_BD where nick = '%s')", newNick));
+            if (resultNick.getInt(1) != 0) {
+                throw new WrongCredentialsException("This nickname is already taken.");
+            }
+            statement.execute(String.format("UPDATE Chat_Client_BD SET nick = '%s' WHERE log = '%s'", newNick, login));
+            return newNick;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public String createUser(String login, String password, String newNick) {
-
-        if(!allUsers.containsKey(newNick)){
-            User newUser = new User(login, password, newNick);
-            allUsers.put(newNick, newUser);
+        try {
+            ResultSet resultNick = statement.executeQuery(String.format("SELECT EXISTS(SELECT * FROM Chat_Client_BD where nick = '%s')", newNick));
+            if (resultNick.getInt(1) != 0) {
+                throw new WrongCredentialsException("This nickname is already taken.");
+            }
+            ResultSet resultLog = statement.executeQuery(String.format("SELECT EXISTS(SELECT * FROM Chat_Client_BD where log = '%s')", login));
+            if (resultLog.getInt(1) != 0) {
+                throw new WrongCredentialsException("This login is already taken.");
+            }
+            statement.execute(String.format("INSERT INTO Chat_Client_BD (nick, log, pas) VALUES ('%s', '%s', '%s')", newNick, login, password));
             return newNick;
-        } else {
-            throw new WrongCredentialsException("This nickname is already taken.");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void deleteUser(String login, String password) {
-                     //@TODO
+        try {
+            ResultSet resultSet = statement.executeQuery(String.format("SELECT nick FROM Chat_Client_BD WHERE log = '%s' and pas = '%s'", login, password));
+            if (!resultSet.isClosed()) {
+                statement.execute(String.format("DELETE FROM Chat_Client_BD WHERE log = '%s'", login));
+            } else {
+                throw new WrongCredentialsException("Wrong login or password.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void changePassword(String login, String password, String newPassword) {
-                     //@TODO
+        try {
+            ResultSet resultSet = statement.executeQuery(String.format("SELECT nick FROM Chat_Client_BD WHERE log = '%s' and pas = '%s'", login, password));
+            if (!resultSet.isClosed()) {
+                statement.execute(String.format("UPDATE Chat_Client_BD SET pas = '%s' WHERE log = '%s'", newPassword, login));
+            } else {
+                throw new WrongCredentialsException("Wrong login or password.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
