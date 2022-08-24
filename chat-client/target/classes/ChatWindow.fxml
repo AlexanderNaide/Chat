@@ -193,16 +193,18 @@
         </MenuBar>
 
         <HBox VBox.vgrow="ALWAYS">
-            <TextArea fx:id="chatArea" editable="false" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+            <VBox fx:id="componentMessagePanel" HBox.hgrow="ALWAYS" >
                 <HBox.margin>
                     <Insets left="6.0" right="6.0" top="6.0" />
                 </HBox.margin>
-            </TextArea>
+
+                <!-- <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS"/> -->
+            </VBox>
             <VBox fx:id="componentContactList" prefWidth="150.0">
                 <HBox.margin>
                     <Insets right="6.0" top="6.0" />
                 </HBox.margin>
-            <ListView fx:id="contactList" prefHeight="300.0" prefWidth="150.0" onMouseClicked="#onMouseClicked"/>
+            <ListView fx:id="contactList" onMouseClicked="#onMouseClicked" prefHeight="300.0" prefWidth="150.0" />
 
 
 <!--                <TreeView fx:id="contactPanel_____Old" onDragDetected="#OnDragDetected" prefHeight="47.0" prefWidth="150.0">

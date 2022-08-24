@@ -16,6 +16,8 @@ import ru.gb.Chatterbox.client.model.contactPanel.Groups;
 import ru.gb.Chatterbox.client.model.contactPanel.Title;
 import ru.gb.Chatterbox.client.model.contactPanel.User;
 import ru.gb.Chatterbox.client.view.contactPanel.ContactPanel;
+import ru.gb.Chatterbox.client.view.messagePanel.MessagePanel;
+import ru.gb.Chatterbox.client.view.messagePanel.SimpleMessagePanel;
 
 import java.io.IOException;
 import java.net.URL;
@@ -28,6 +30,7 @@ import static ru.gb.Chatterbox.client.lang.lang.RUSSIAN;
 
 public class ChatView {
 
+    public VBox componentMessagePanel;
     public ListView<Pane> contactList;
     public ContactPanel contactPanel;
     public Language language;
@@ -46,10 +49,12 @@ public class ChatView {
     public VBox loginPanel;
     @FXML
     public VBox mainPanel;
+    public MessagePanel messagePanel;
 
     public void initialize(URL location, ResourceBundle resources) {
         contactPanel = new ContactPanel(contactList);
         language = new Language(this);
+        messagePanel = new SimpleMessagePanel(componentMessagePanel);
 
     }
 
@@ -86,12 +91,12 @@ public class ChatView {
             }
         }
         text = language.text("Message for") + forMessage + ":\n    " + text;
-        appendText(text);
+        messagePanel.appendText(text);
     }
 
-    public void appendText(String text){
+/*    public void appendText(String text){
         chatArea.appendText(text + System.lineSeparator());
-    }
+    }*/
 
     public void showError(String error) {
         Alert alert = new Alert(Alert.AlertType.ERROR,
