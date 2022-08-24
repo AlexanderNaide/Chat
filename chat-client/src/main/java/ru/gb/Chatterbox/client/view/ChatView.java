@@ -16,6 +16,7 @@ import ru.gb.Chatterbox.client.model.contactPanel.Groups;
 import ru.gb.Chatterbox.client.model.contactPanel.Title;
 import ru.gb.Chatterbox.client.model.contactPanel.User;
 import ru.gb.Chatterbox.client.view.contactPanel.ContactPanel;
+import ru.gb.Chatterbox.client.view.messagePanel.FileTxtMessagePanel;
 import ru.gb.Chatterbox.client.view.messagePanel.MessagePanel;
 import ru.gb.Chatterbox.client.view.messagePanel.SimpleMessagePanel;
 
@@ -54,7 +55,8 @@ public class ChatView {
     public void initialize(URL location, ResourceBundle resources) {
         contactPanel = new ContactPanel(contactList);
         language = new Language(this);
-        messagePanel = new SimpleMessagePanel(componentMessagePanel);
+//        messagePanel = new SimpleMessagePanel(componentMessagePanel);
+        messagePanel = new FileTxtMessagePanel(componentMessagePanel);
 
     }
 
@@ -90,7 +92,7 @@ public class ChatView {
                 forMessage.deleteCharAt(forMessage.length() - 1);
             }
         }
-        text = language.text("Message for") + forMessage + ":\n    " + text;
+        text = language.text("Message for") + forMessage + ":    " + text;
         messagePanel.appendText(text);
     }
 
@@ -117,12 +119,13 @@ public class ChatView {
         helpWindow.show();
     }
 
-    public void authOk(String user){
+    public void authOk(String user) {
         loginPanel.setVisible(false);
         primaryStage.setTitle("Chatterbox - " + user);
         primaryStage.setMinHeight(578);
         primaryStage.setMinWidth(662);
         mainPanel.setVisible(true);
+        messagePanel.readHistory(user);
     }
 
     public void sendAuthorisationWindow(MouseEvent mouseEvent) {

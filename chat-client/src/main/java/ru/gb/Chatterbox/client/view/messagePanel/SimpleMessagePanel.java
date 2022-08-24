@@ -20,4 +20,8 @@ public class SimpleMessagePanel implements MessagePanel{
     public void appendText(String text) {
         chatArea.appendText(text + System.lineSeparator());
     }
+
+    @Override
+    public void readHistory(String name) {
+    }
 }
