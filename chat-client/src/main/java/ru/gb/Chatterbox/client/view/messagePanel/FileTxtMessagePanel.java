@@ -2,14 +2,17 @@ package ru.gb.Chatterbox.client.view.messagePanel;
 
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
+import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class FileTxtMessagePanel implements MessagePanel{
 
     public TextArea chatArea;
     private File fileHistory;
+    int historySize = 100;
 
     public FileTxtMessagePanel(VBox vb){
         chatArea = new TextArea();
@@ -28,7 +31,38 @@ public class FileTxtMessagePanel implements MessagePanel{
         chatArea.appendText(text + System.lineSeparator());
     }
 
+    /**
+     * Предварительно подгрузить зависимость в Pom.xml (для подключения ReversedLinesFileReader)
+     *         <dependency>
+     *             <groupId>commons-io</groupId>
+     *             <artifactId>commons-io</artifactId>
+     *             <version>2.6</version>
+     *         </dependency>
+     */
     @Override
+    public void readHistory(String name) {
+        try{
+            fileHistory = new File("chat-client/src/main/resources/history/" + name + ".txt");
+            if (!fileHistory.createNewFile()){
+                ArrayList<String> history = new ArrayList<>();
+                try (ReversedLinesFileReader reader = new ReversedLinesFileReader(fileHistory, StandardCharsets.UTF_8)){
+                    String str;
+                    while((str = reader.readLine()) != null && history.size() < historySize){
+                        history.add(str);
+                    }
+                    for (int i = history.size() - 1; i >= 0 ; i--) {
+                        appendHistory(history.get(i));
+                    }
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+/*    @Override
     public void readHistory(String name) {
         try{
             fileHistory = new File("chat-client/src/main/resources/history/" + name + ".txt");
@@ -48,7 +82,7 @@ public class FileTxtMessagePanel implements MessagePanel{
         } catch (IOException e){
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void writeHistory(String text) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileHistory, true))){

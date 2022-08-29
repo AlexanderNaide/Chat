@@ -19,3 +19,8 @@
 Message for ALL:    Привет
 Message for БТКашки:    as cas
 Message for ALL:    as cas
+Message for ALL:    sdvsdv
+Message for Дашка:    Как водичка?
+Message for Ваня:    Чё по чем, чувачек?
+Message for Толик:    Есть чё позырить?
+Message for Женька-печенька:    Женька - чеченька
