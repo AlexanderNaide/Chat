@@ -2,6 +2,5 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/chat-server/src/main/java/ru/gb/Chatterbox/server/service/impl/inSQLUserServiceImpl.java" dialect="GenericSQL" />
-    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/4aea2183-de92-4155-8b50-f606f65e6185/console.sql" dialect="SQLite" />
   </component>
 </project>

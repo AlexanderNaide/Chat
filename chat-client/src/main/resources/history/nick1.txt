@@ -1,0 +1,26 @@
+[nick2]: Строка 1
+[nick2]: Строка 2
+[nick2]: Строка 3
+[nick2]: Строка 4
+[nick2]: Строка 5
+[nick2]: Строка 6
+[nick2]: Строка 7
+[nick2]: Строка 8
+[nick2]: Строка 9
+[nick2]: Строка 10
+[nick2]: Строка 11
+[nick2]: Строка 12
+[nick2]: Строка 13
+[nick2]: Строка 14
+[nick2]: Строка 15
+[nick2]: Строка 16
+[nick2]: Строка 17
+[nick2]: Строка 18
+Message for ALL:    Привет
+Message for БТКашки:    as cas
+Message for ALL:    as cas
+Message for ALL:    sdvsdv
+Message for Дашка:    Как водичка?
+Message for Ваня:    Чё по чем, чувачек?
+Message for Толик:    Есть чё позырить?
+Message for Женька-печенька:    Женька - чеченька

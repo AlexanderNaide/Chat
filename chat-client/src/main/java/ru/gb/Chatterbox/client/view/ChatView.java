@@ -16,6 +16,9 @@ import ru.gb.Chatterbox.client.model.contactPanel.Groups;
 import ru.gb.Chatterbox.client.model.contactPanel.Title;
 import ru.gb.Chatterbox.client.model.contactPanel.User;
 import ru.gb.Chatterbox.client.view.contactPanel.ContactPanel;
+import ru.gb.Chatterbox.client.view.messagePanel.FileTxtMessagePanel;
+import ru.gb.Chatterbox.client.view.messagePanel.MessagePanel;
+import ru.gb.Chatterbox.client.view.messagePanel.SimpleMessagePanel;
 
 import java.io.IOException;
 import java.net.URL;
@@ -28,6 +31,7 @@ import static ru.gb.Chatterbox.client.lang.lang.RUSSIAN;
 
 public class ChatView {
 
+    public VBox componentMessagePanel;
     public ListView<Pane> contactList;
     public ContactPanel contactPanel;
     public Language language;
@@ -46,10 +50,13 @@ public class ChatView {
     public VBox loginPanel;
     @FXML
     public VBox mainPanel;
+    public MessagePanel messagePanel;
 
     public void initialize(URL location, ResourceBundle resources) {
         contactPanel = new ContactPanel(contactList);
         language = new Language(this);
+//        messagePanel = new SimpleMessagePanel(componentMessagePanel);
+        messagePanel = new FileTxtMessagePanel(componentMessagePanel);
 
     }
 
@@ -85,13 +92,13 @@ public class ChatView {
                 forMessage.deleteCharAt(forMessage.length() - 1);
             }
         }
-        text = language.text("Message for") + forMessage + ":\n    " + text;
-        appendText(text);
+        text = language.text("Message for") + forMessage + ":    " + text;
+        messagePanel.appendText(text);
     }
 
-    public void appendText(String text){
+/*    public void appendText(String text){
         chatArea.appendText(text + System.lineSeparator());
-    }
+    }*/
 
     public void showError(String error) {
         Alert alert = new Alert(Alert.AlertType.ERROR,
@@ -112,12 +119,13 @@ public class ChatView {
         helpWindow.show();
     }
 
-    public void authOk(String user){
+    public void authOk(String user) {
         loginPanel.setVisible(false);
         primaryStage.setTitle("Chatterbox - " + user);
         primaryStage.setMinHeight(578);
         primaryStage.setMinWidth(662);
         mainPanel.setVisible(true);
+        messagePanel.readHistory(user);
     }
 
     public void sendAuthorisationWindow(MouseEvent mouseEvent) {

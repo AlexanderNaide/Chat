@@ -72,7 +72,8 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
     public TextField editing;
     public AnchorPane scrollContactPane;
     public VBox scrollContactList;
-//    public ListView contactList;
+//    public VBox componentMessagePanel;
+//        public ListView contactList;
     //    public ListView<Pane> contactList;
     @FXML
     private Button add;
@@ -178,7 +179,7 @@ public class ChatController<s> extends ChatView implements Initializable, Messag
                 chatModel.parseUsers(split, user);
                 updateItems();
             }
-            default -> appendText(split[1]);
+            default -> messagePanel.appendText(split[1]);
         }
     }
 
