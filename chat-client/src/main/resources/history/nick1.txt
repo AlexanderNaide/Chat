@@ -24,3 +24,16 @@ Message for Дашка:    Как водичка?
 Message for Ваня:    Чё по чем, чувачек?
 Message for Толик:    Есть чё позырить?
 Message for Женька-печенька:    Женька - чеченька
+Message for ALL:    sdvsd
+[nick2]: sdvd
+Message for ALL:    sdvdv
+[nick2]: sdf vd
+Message for ALL:    svdv
+Message for ALL:    111111
+[nick2]: 222
+Message for ALL:    33333
+[nick2]: 555
+[nick2]: svffvffffffffffffff
+Message for ALL:    6666
+[nick2]: sss
+Message for murka:    ccc

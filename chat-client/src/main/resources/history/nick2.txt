@@ -16,3 +16,14 @@
 [nick2]: Строка 16
 [nick2]: Строка 17
 [nick2]: Строка 18
+Message for ALL:    sdvd
+[nick1]: sdvdv
+Message for ALL:    sdf vd
+[nick1]: svdv
+Message for ALL:    111
+Message for ALL:    222
+[nick1]: 33333
+Message for ALL:    555
+Message for ALL:    svffvffffffffffffff
+[nick1]: 6666
+Message for ALL:    sss

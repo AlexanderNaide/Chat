@@ -1,8 +1,7 @@
-package ru.gb.Chatterbox.server.service.impl;
+package ru.gb.Chatterbox.server.service.userService;
 
 import ru.gb.Chatterbox.server.error.WrongCredentialsException;
 import ru.gb.Chatterbox.server.model.User;
-import ru.gb.Chatterbox.server.service.UserService;
 
 import java.io.File;
 import java.util.*;
