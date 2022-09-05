@@ -1,17 +1,15 @@
-package ru.gb.Chatterbox.server;
+package ru.gb.Chatterbox.server.service.serverService;
 
-import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 import ru.gb.Chatterbox.enums.Command;
 import ru.gb.Chatterbox.server.error.WrongCredentialsException;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 
-public class ClientHandler {
+public class ClientHandlerOld implements ClientHandler{
 
     private Socket socket;
     private DataOutputStream out;
@@ -20,7 +18,7 @@ public class ClientHandler {
     private Server server;
     private String user;
 
-    public ClientHandler(Socket socket, Server server){
+    public ClientHandlerOld(Socket socket, Server server){
         try {
             this.server = server;
             this.socket = socket;

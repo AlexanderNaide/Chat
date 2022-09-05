@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/chat-server/src/main/java/ru/gb/Chatterbox/server/service/impl/inSQLUserServiceImpl.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/chat-server/src/main/java/ru/gb/Chatterbox/server/service/userService/inSQLUserServiceImpl.java" dialect="GenericSQL" />
   </component>
 </project>

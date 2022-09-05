@@ -1,4 +1,4 @@
-package ru.gb.Chatterbox.server.service;
+package ru.gb.Chatterbox.server.service.userService;
 
 import ru.gb.Chatterbox.server.model.User;
 
