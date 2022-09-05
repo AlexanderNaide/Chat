@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.LIST_USERS;
+import static ru.gb.Chatterbox.server.App.logger;
 
 public class ServerForExecutorService extends Server{
 
@@ -19,16 +20,19 @@ public class ServerForExecutorService extends Server{
 
     public void start() {
         try(ServerSocket serverSocket = new ServerSocket(PORT)){
-            System.out.println("Server start.");
+            logger.info("Server start.");
+//            System.out.println("Server start.");
             userService.start();
             while(!serverSocket.isClosed()){
-                System.out.println("Waiting for connection......");
+//                System.out.println("Waiting for connection......");
                 Socket socket = serverSocket.accept();
-                System.out.println("Client connection.");
+                logger.info("New client connection.");
+//                System.out.println("Client connection.");
                 ClientHandler handler = new ClientHandlerForExecutorService(socket, this);
                 handler.handle();
             }
         } catch (IOException e){
+            logger.error(e.getMessage());
             e.printStackTrace();
         } finally {
             shutdown();
@@ -48,6 +52,7 @@ public class ServerForExecutorService extends Server{
     }
 
     private void shutdown(){
+        logger.info("Server stop.");
         userService.stop();
         executorService.shutdown();
     }

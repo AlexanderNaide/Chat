@@ -2,14 +2,13 @@ package ru.gb.Chatterbox.server.service.serverService;
 
 import ru.gb.Chatterbox.enums.Command;
 import ru.gb.Chatterbox.server.error.WrongCredentialsException;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
+import static ru.gb.Chatterbox.server.App.logger;
 
 public class ClientHandlerForExecutorService implements ClientHandler{
 
@@ -25,9 +24,11 @@ public class ClientHandlerForExecutorService implements ClientHandler{
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
-            System.out.println("Handler created.");
+            logger.info("Handler created.");
+//            System.out.println("Handler created.");
         } catch (IOException e){
-            System.err.println("Connection problems with user: " + user);
+            logger.error("Connection problems with user: {}", user);
+//            System.err.println("Connection problems with user: " + user);
         }
     }
 
@@ -37,6 +38,7 @@ public class ClientHandlerForExecutorService implements ClientHandler{
             out.close();
             socket.close();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
 
@@ -45,7 +47,7 @@ public class ClientHandlerForExecutorService implements ClientHandler{
 
     public void handle(){
         ServerForExecutorService.executorService.execute(() -> {
-            System.out.println("Authorizing");
+//            System.out.println("Authorizing");
 
             try{
                 while (!socket.isClosed()){
@@ -60,17 +62,20 @@ public class ClientHandlerForExecutorService implements ClientHandler{
                             nickname = server.getUserService().authenticate(parsed[1], parsed[2]);
                         } catch (WrongCredentialsException e){
                             response = ERROR_MESSAGE.getCommand() + REGEX + e.getMessage();
-                            System.out.println("Wrong credentials: " + parsed[1]);
+//                            System.out.println("Wrong credentials: " + parsed[1]);
+                            logger.warn("Wrong credentials: {}", parsed[1]);
                         }
                         if(server.isUserAlreadyOnline(nickname)){
                             response = ERROR_MESSAGE.getCommand() + REGEX + "This client already connected.";
-                            System.out.println("Already connected.");
+//                            System.out.println("Already connected.");
+                            logger.warn("This client already connected: {}", nickname);
                         }
 
                         if (!response.equals("")){
                             send(response);
                         } else {
                             this.user = nickname;
+                            logger.info("Authorizing {}", user);
                             send(AUTH_OK.getCommand() + REGEX + nickname);
                             server.addHandler(this);
                             break;
@@ -84,7 +89,8 @@ public class ClientHandlerForExecutorService implements ClientHandler{
                             nickname = server.getUserService().createUser(parsed[1], parsed[2], parsed[3]);
                         } catch (WrongCredentialsException e){
                             response = ERROR_MESSAGE.getCommand() + REGEX + e.getMessage();
-                            System.out.println("Wrong credentials: " + parsed[1]);
+//                            System.out.println("Wrong credentials: " + parsed[1]);
+                            logger.warn("Wrong credentials: {}", parsed[1]);
                         }
 
                         if (!response.equals("")){
@@ -104,18 +110,22 @@ public class ClientHandlerForExecutorService implements ClientHandler{
                         parseMessage(message);
                     } catch (IOException e){
                         Thread.currentThread().interrupt();
-                        System.out.println("Connection broken with client: " + user);
+//                        System.out.println("Connection broken with client: " + user);
+                        logger.warn("Connection broken with client: {}", user);
                         server.removeHandler(this);
                     }
                 }
             } catch (IOException e){
+                logger.error(e.getMessage());
                 e.printStackTrace();
             } finally {
                 try {
                     in.close();
                     out.close();
                     socket.close();
+                    logger.info("Handler closed.");
                 } catch (IOException e) {
+                    logger.error(e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -139,6 +149,7 @@ public class ClientHandlerForExecutorService implements ClientHandler{
         try{
             out.writeUTF(msg);
         } catch (IOException e){
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
     }
