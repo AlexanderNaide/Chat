@@ -3,8 +3,6 @@ package ru.gb.Chatterbox.server.service.serverService;
 import ru.gb.Chatterbox.server.service.userService.UserService;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 import static ru.gb.Chatterbox.constants.MessageConstants.REGEX;
 import static ru.gb.Chatterbox.enums.Command.*;
 

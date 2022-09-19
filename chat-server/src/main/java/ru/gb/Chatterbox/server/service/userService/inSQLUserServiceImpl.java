@@ -1,8 +1,8 @@
 package ru.gb.Chatterbox.server.service.userService;
 
 import ru.gb.Chatterbox.server.error.WrongCredentialsException;
-
 import java.sql.*;
+import static ru.gb.Chatterbox.server.App.logger;
 
 public class inSQLUserServiceImpl implements UserService {
 
@@ -19,6 +19,7 @@ public class inSQLUserServiceImpl implements UserService {
             connect();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+            logger.error(e.getMessage());
 //            throw new RuntimeException(e);
         }
 
@@ -42,11 +43,13 @@ public class inSQLUserServiceImpl implements UserService {
             connection.setAutoCommit(true);
 
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
 //            throw new RuntimeException(e);
         }
 
-        System.out.println("User service started.");
+        logger.info("User service started.");
+//        System.out.println("User service started.");
     }
 
     private static void connect() throws ClassNotFoundException, SQLException {
@@ -64,10 +67,12 @@ public class inSQLUserServiceImpl implements UserService {
         try {
             disconnect();
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
 //            throw new RuntimeException(e);
         }
-        System.out.println("User service stopped.");
+        logger.info("User service stopped.");
+//        System.out.println("User service stopped.");
     }
 
     @Override
@@ -78,9 +83,11 @@ public class inSQLUserServiceImpl implements UserService {
                 return resultSet.getString(1);
             }
             else{
+                logger.warn("Failed authenticate - Wrong login or password.");
                 throw new WrongCredentialsException("Wrong login or password.");
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -90,11 +97,13 @@ public class inSQLUserServiceImpl implements UserService {
         try {
             ResultSet resultNick = statement.executeQuery(String.format("SELECT EXISTS(SELECT * FROM Chat_Client_BD where nick = '%s')", newNick));
             if (resultNick.getInt(1) != 0) {
+                logger.warn("Failed changeNick - This nickname is already taken - {}", newNick);
                 throw new WrongCredentialsException("This nickname is already taken.");
             }
             statement.execute(String.format("UPDATE Chat_Client_BD SET nick = '%s' WHERE log = '%s'", newNick, login));
             return newNick;
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -104,15 +113,18 @@ public class inSQLUserServiceImpl implements UserService {
         try {
             ResultSet resultNick = statement.executeQuery(String.format("SELECT EXISTS(SELECT * FROM Chat_Client_BD where nick = '%s')", newNick));
             if (resultNick.getInt(1) != 0) {
+                logger.warn("Failed createUser - This nickname is already taken - {}", newNick);
                 throw new WrongCredentialsException("This nickname is already taken.");
             }
             ResultSet resultLog = statement.executeQuery(String.format("SELECT EXISTS(SELECT * FROM Chat_Client_BD where log = '%s')", login));
             if (resultLog.getInt(1) != 0) {
+                logger.warn("Failed createUser - This login is already taken - {}", login);
                 throw new WrongCredentialsException("This login is already taken.");
             }
             statement.execute(String.format("INSERT INTO Chat_Client_BD (nick, log, pas) VALUES ('%s', '%s', '%s')", newNick, login, password));
             return newNick;
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -124,9 +136,11 @@ public class inSQLUserServiceImpl implements UserService {
             if (!resultSet.isClosed()) {
                 statement.execute(String.format("DELETE FROM Chat_Client_BD WHERE log = '%s'", login));
             } else {
+                logger.warn("Failed deleteUser - Wrong login or password.");
                 throw new WrongCredentialsException("Wrong login or password.");
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -138,9 +152,11 @@ public class inSQLUserServiceImpl implements UserService {
             if (!resultSet.isClosed()) {
                 statement.execute(String.format("UPDATE Chat_Client_BD SET pas = '%s' WHERE log = '%s'", newPassword, login));
             } else {
+                logger.warn("Failed changePassword - Wrong login or password.");
                 throw new WrongCredentialsException("Wrong login or password.");
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }

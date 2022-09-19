@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+
+    <Properties>
+        <Property name="basePatch">logs</Property>
+    </Properties>
+
+    <Appenders>
+        <File name = "FILE" filename = "chat-server/src/main/java/ru/gb/Chatterbox/server/log/logFile.log" append = "true">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L) - %m%n"/>
+        </File>
+
+        <Console name="STDOUT" target = "SYSTEM_OUT">
+            <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} [%t] %C (%F:%L) - %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="ru.gb" level="debug" />
+        <Root level="debug">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
