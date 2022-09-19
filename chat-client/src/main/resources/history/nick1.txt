@@ -37,3 +37,4 @@ Message for ALL:    33333
 Message for ALL:    6666
 [nick2]: sss
 Message for murka:    ccc
+Сообщение для ALL:    sdvsdv
